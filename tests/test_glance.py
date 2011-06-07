@@ -43,11 +43,12 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         self.assertEqual('{"images": []}', content)
 
-    def test_002_upload_kernel_image_to_glance(self):
+    def test_002_upload_image(self):
         path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-image',
-                   'x-image-meta-disk-format': 'raw',
+                   'x-image-meta-disk-format': 'ami',
+                   'x-image-meta-container-format': 'ami',
                    'Content-Type': 'application/octet-stream'}
         image_file = open("openwrt-x86-ext2.image", "rb")
         body = image_file.read(8)
@@ -56,11 +57,34 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.assertEqual(201, response.status)
         # pprint(content)
         data = json.loads(content)
-        self.glance['kernel_id'] = data['image']['id']
+        self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
 
-    def test_999_delete_image_from_glance_api(self):
+    def test_003_upload_kernel_to_glance(self):
+        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+        headers = {'x-image-meta-is-public': 'true',
+                   'x-image-meta-name': 'test-kernel',
+                   'x-image-meta-disk-format': 'aki',
+                   'x-image-meta-container-format': 'aki',
+                   'Content-Type': 'application/octet-stream'}
+        image_file = open("openwrt-x86-vmlinuz", "rb")
+        body = image_file.read(8)
+        http = httplib2.Http()
+        response, content = http.request(path, 'POST', headers=headers, body=body)
+        self.assertEqual(201, response.status)
+        # pprint(content)
+        data = json.loads(content)
+        self.glance['kernel_id'] = data['image']['id']
+        self.assertEqual(data['image']['name'], "test-kernel")
+
+    def test_998_delete_kernel_from_glance(self):
         path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
+        http = httplib2.Http()
+        response, content = http.request(path, 'DELETE')
+        self.assertEqual(200, response.status)
+
+    def test_999_delete_image_from_glance_api(self):
+        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
