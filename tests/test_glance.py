@@ -34,32 +34,33 @@ import tests
 TEST_HOST = "10.127.52.133"
 TEST_PORT = "9292"
 
+
 class TestGlanceAPI(tests.FunctionalTest):
     def test_001_connect_to_glance_api(self):
-        path = "http://%s:%s/images" % (TEST_HOST,TEST_PORT)
+        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
         http = httplib2.Http()
-        response,content = http.request(path, 'GET')
-	self.assertEqual(200, response.status)
+        response, content = http.request(path, 'GET')
+        self.assertEqual(200, response.status)
         self.assertEqual('{"images": []}', content)
 
     def test_002_upload_kernel_image_to_glance(self):
-        path = "http://%s:%s/images" % (TEST_HOST,TEST_PORT)
+        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-image',
                    'x-image-meta-disk-format': 'raw',
                    'Content-Type': 'application/octet-stream'}
         image_file = open("openwrt-x86-ext2.image", "rb")
-	body = image_file.read(8)
+        body = image_file.read(8)
         http = httplib2.Http()
-        response,content = http.request(path, 'POST', headers=headers, body=body)
+        response, content = http.request(path, 'POST', headers=headers, body=body)
         self.assertEqual(201, response.status)
         # pprint(content)
-	data = json.loads(content)
-	self.glance['image_id'] = data['image']['id']
-	self.assertEqual(data['image']['name'], "test-image")
+        data = json.loads(content)
+        self.glance['kernel_id'] = data['image']['id']
+        self.assertEqual(data['image']['name'], "test-image")
 
     def test_999_delete_image_from_glance_api(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST,TEST_PORT,self.glance['image_id'])
+        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
         http = httplib2.Http()
-        response,content = http.request(path, 'DELETE')
+        response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)

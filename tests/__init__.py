@@ -18,8 +18,10 @@
 import unittest
 
 TEST_DATA = {}
+
+
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
         global TEST_DATA
-        self.glance = TEST_DATA 
+        self.glance = TEST_DATA
