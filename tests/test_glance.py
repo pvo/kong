@@ -42,7 +42,7 @@ class TestGlanceAPI(tests.FunctionalTest):
 	self.assertEqual(200, response.status)
         self.assertEqual('{"images": []}', content)
 
-    def test_002_upload_image_to_glance_api(self):
+    def test_002_upload_kernel_image_to_glance(self):
         path = "http://%s:%s/images" % (TEST_HOST,TEST_PORT)
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-image',
