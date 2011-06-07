@@ -56,6 +56,7 @@ def check_dependencies():
             print 'done.'
     print 'done.'
 
+
 def create_virtualenv(venv=VENV):
     """Creates the virtual environment and installs PIP only into the
     virtual environment
@@ -92,8 +93,8 @@ def print_help():
  Olympus testing uses virtualenv to track and manage Python dependencies
  while in development and testing.
 
- To activate the Olympus virtualenv for the extent of your current shell session
- you can run:
+ To activate the Olympus virtualenv for the extent of your current shell
+ session you can run:
 
  $ source .olympus-venv/bin/activate
 
