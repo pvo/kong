@@ -16,6 +16,7 @@
 #    under the License.
 
 import unittest
+from hashlib import md5
 
 TEST_DATA = {}
 
@@ -25,3 +26,10 @@ class FunctionalTest(unittest.TestCase):
     def setUp(self):
         global TEST_DATA
         self.glance = TEST_DATA
+
+    def _md5sum_file(self, path):
+        md5sum = md5()
+        with open(path, 'rb') as file:
+            for chunk in iter(lambda: file.read(8192), ''):
+                md5sum.update(chunk)
+        return md5sum.hexdigest()
