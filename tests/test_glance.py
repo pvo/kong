@@ -23,6 +23,7 @@ import tempfile
 import unittest
 import httplib2
 import urllib
+import hashlib
 
 from pprint import pprint
 
@@ -43,48 +44,78 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         self.assertEqual('{"images": []}', content)
 
-    def test_002_upload_image(self):
-        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
-        headers = {'x-image-meta-is-public': 'true',
-                   'x-image-meta-name': 'test-image',
-                   'x-image-meta-disk-format': 'ami',
-                   'x-image-meta-container-format': 'ami',
-                   'Content-Type': 'application/octet-stream'}
-        image_file = open("openwrt-x86-ext2.image", "rb")
-        body = image_file.read(8)
-        http = httplib2.Http()
-        response, content = http.request(path, 'POST', headers=headers, body=body)
-        self.assertEqual(201, response.status)
-        # pprint(content)
-        data = json.loads(content)
-        self.glance['image_id'] = data['image']['id']
-        self.assertEqual(data['image']['name'], "test-image")
-
-    def test_003_upload_kernel_to_glance(self):
+    def test_002_upload_kernel_to_glance(self):
+	kernel = "sample_vm/vmlinuz-2.6.32-23-server"
+        # md5sum = self._md5sum_file(kernel)
+        # content_length = os.path.getsize(kernel)
         path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-kernel',
                    'x-image-meta-disk-format': 'aki',
                    'x-image-meta-container-format': 'aki',
+                   'Content-Length': '%d' % os.path.getsize(kernel),
                    'Content-Type': 'application/octet-stream'}
-        image_file = open("openwrt-x86-vmlinuz", "rb")
-        body = image_file.read(8)
         http = httplib2.Http()
-        response, content = http.request(path, 'POST', headers=headers, body=body)
+        image_file = open(kernel, "rb")
+        response, content = http.request(path, 'POST', headers=headers, body=image_file)
+        image_file.close()
         self.assertEqual(201, response.status)
         # pprint(content)
         data = json.loads(content)
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
+        self.assertEqual(data['image']['checksum'], self._md5sum_file(kernel))
 
-    def test_998_delete_kernel_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
-        http = httplib2.Http()
-        response, content = http.request(path, 'DELETE')
-        self.assertEqual(200, response.status)
+    #def test_003_upload_initrd_to_glance(self):
+    #    path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+    #    headers = {'x-image-meta-is-public': 'true',
+    #               'x-image-meta-name': 'test-ramdisk',
+    #               'x-image-meta-disk-format': 'ari',
+    #               'x-image-meta-container-format': 'ari',
+    #               'Content-Type': 'application/octet-stream'}
+    #    image_file = open("../sample_vm/initrd.img-2.6.32-23-server", "rb")
+    #    body = image_file.read(8)
+    #    http = httplib2.Http()
+    #    response, content = http.request(path, 'POST', headers=headers, body=body)
+    #    self.assertEqual(201, response.status)
+    #    # pprint(content)
+    #    data = json.loads(content)
+    #    self.glance['ramdisk_id'] = data['image']['id']
+    #    self.assertEqual(data['image']['name'], "test-ramdisk")
 
-    def test_999_delete_image_from_glance_api(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['image_id'])
-        http = httplib2.Http()
-        response, content = http.request(path, 'DELETE')
-        self.assertEqual(200, response.status)
+    #def test_004_upload_image(self):
+    #    path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+    #    headers = {'x-image-meta-is-public': 'true',
+    #               'x-image-meta-name': 'test-image',
+    #               'x-image-meta-disk-format': 'ami',
+    #               'x-image-meta-container-format': 'ami',
+    #               'x-image-meta-property-Kernel_id': '%s' % self.glance['kernel_id'],
+    #               'x-image-meta-property-Ramdisk_id': '%s' % self.glance['ramdisk_id'],
+    #               'Content-Type': 'application/octet-stream'}
+    #    image_file = open("../sample_vm/ubuntu-lucid.img", "rb")
+    #    body = image_file.read(8)
+    #    http = httplib2.Http()
+    #    response, content = http.request(path, 'POST', headers=headers, body=body)
+    #    self.assertEqual(201, response.status)
+    #    # pprint(content)
+    #    data = json.loads(content)
+    #    self.glance['image_id'] = data['image']['id']
+    #    self.assertEqual(data['image']['name'], "test-image")
+
+    #def test_997_delete_kernel_from_glance(self):
+    #    path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
+    #    http = httplib2.Http()
+    #    response, content = http.request(path, 'DELETE')
+    #    self.assertEqual(200, response.status)
+
+    #def test_998_delete_initrd_from_glance(self):
+    #    path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['ramdisk_id'])
+    #    http = httplib2.Http()
+    #    response, content = http.request(path, 'DELETE')
+    #    self.assertEqual(200, response.status)
+
+    #def test_999_delete_image_from_glance_api(self):
+    #    path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['image_id'])
+    #    http = httplib2.Http()
+    #    response, content = http.request(path, 'DELETE')
+    #    self.assertEqual(200, response.status)
