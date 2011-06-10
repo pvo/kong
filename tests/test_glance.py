@@ -80,11 +80,11 @@ class TestGlanceAPI(tests.FunctionalTest):
         response, content = http.request(path, 'POST', headers=headers, body=image_file)
         image_file.close()
         self.assertEqual(201, response.status)
-        # pprint(content)
+        pprint(content)
         data = json.loads(content)
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
-        self.assertEqual(dyyata['image']['checksum'], self._md5sum_file(initrd))
+        self.assertEqual(data['image']['checksum'], self._md5sum_file(initrd))
 
     def test_004_upload_image(self):
         image = "sample_vm/ubuntu-lucid.img"
