@@ -16,6 +16,7 @@
 #    under the License.
 
 import unittest
+import os
 from hashlib import md5
 
 TEST_DATA = {}
@@ -33,3 +34,14 @@ class FunctionalTest(unittest.TestCase):
             for chunk in iter(lambda: file.read(8192), ''):
                 md5sum.update(chunk)
         return md5sum.hexdigest()
+
+    def _read_in_chunks(self, infile, chunk_size=1024*64):
+        file_data = open(infile, "rb")
+        while True:
+            # chunk = file_data.read(chunk_size).encode('base64')
+            chunk = file_data.read(chunk_size)
+            if chunk:
+                yield chunk
+            else:
+                return
+        file_data.close()
