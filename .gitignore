@@ -1,2 +1,5 @@
 .olympus-venv
 *.pyc
+sample_vm/initrd.img-2.6.32-23-server
+sample_vm/ubuntu-lucid.img
+sample_vm/vmlinuz-2.6.32-23-server
