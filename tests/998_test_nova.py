@@ -49,21 +49,51 @@ class TestNovaAPI(tests.FunctionalTest):
 		if (key == 'x-auth-token'):
 			self.nova['X-Auth-Token'] = val
 
-    def test_002_list_images(self):
-	path = "http://%s:%s/%s/images" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
-	http = httplib2.Http()
-	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
-		   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
-	response, content = http.request(path, 'GET', headers=headers)
-	# self.assertEqual(200, response.status)
-        # self.assertEqual('{"images": []}', content)
-	pprint(self.glance['ramdisk_id'])
-
-    def test_003_list_servers(self):
-	path = "http://%s:%s/%s/servers" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+    def test_003_flavors(self):
+	path = "http://%s:%s/%s/flavors" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
 	http = httplib2.Http()
 	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
 		   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
 	response, content = http.request(path, 'GET', headers=headers)
 	self.assertEqual(200, response.status)
-    	self.assertEqual('{"servers": []}', content)
+	self.assertNotEqual('{"flavors": []}', content)
+
+    def test_004_kernel(self):
+	# Change 180 in the URL string to self.glance['kernel_id'] from the glance tests
+	path = "http://%s:%s/%s/images/180" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+	http = httplib2.Http()
+	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+	data = json.loads(content)
+	self.assertEqual(data['image']['status'], 'ACTIVE')
+
+    def test_005_ramdisk(self):
+       # Change 181 in the URL string to self.glance['ramdisk_id'] from the glance tests
+	path = "http://%s:%s/%s/images/181" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+        http = httplib2.Http()
+        headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+        data = json.loads(content)
+        self.assertEqual(data['image']['status'], 'ACTIVE')
+
+    def test_006_images(self):
+        # Change 182 in the URL string to self.glance['image_id']
+	path = "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+	http = httplib2.Http()
+	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+		   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
+	response, content = http.request(path, 'GET', headers=headers)
+	self.assertEqual(200, response.status)
+	data = json.loads(content)
+	self.assertEqual(data['image']['status'], 'ACTIVE')
+
+    def test_007_create_server(self):
+	path = "http://%s:%s/%s/servers" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+        http = httplib2.Http()
+        headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
+			
