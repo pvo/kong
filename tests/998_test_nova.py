@@ -24,6 +24,7 @@ import unittest
 import httplib2
 import urllib
 import hashlib
+import time
 
 from pprint import pprint
 
@@ -95,5 +96,36 @@ class TestNovaAPI(tests.FunctionalTest):
 	path = "http://%s:%s/%s/servers" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
         http = httplib2.Http()
         headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']),
+		   'Content-Type' : 'application/json' }
+
+	# Change imageRef to self.glance['image_id']
+	json_str = { "server" : 
+			{
+				"name" : "testing server creation",
+   				"flavorRef" : "http://%s:%s/%s/flavors/3" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER),
+   				"imageRef" : "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+   			} 
+		    }		
+	data = json.dumps(json_str)
+	response,content = http.request(path, 'POST', headers=headers, body=data)
+	json_return = json.loads(content)
+	self.assertEqual(200, response.status)
+	self.assertEqual(json_return['server']['status'], "BUILD")
+	self.nova['server_id'] = json_return['server']['id']
+
+    def test_008_server_exits_build(self):
+	count = 0
+	path = "http://%s:%s/%s/servers/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.nova['server_id'])
+	http = httplib2.Http()
+        headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
                    'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
-			
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+	data = json.loads(content)
+	while ( data['server']['status'] != 'ACTIVE' ):
+		response, content = http.request(path, 'GET', headers=headers)
+		data = json.loads(content)
+		time.sleep(10)
+		count = count + 10
+	self.assertEqual(data['server']['status'], "ACTIVE")
