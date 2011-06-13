@@ -103,26 +103,8 @@ class TestGlanceAPI(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'POST', headers=headers, body=upload_data)
         self.assertEqual(201, response.status)
-        # pprint(content)
+        pprint(content)
         data = json.loads(content)
         self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
-
-    def test_997_delete_kernel_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
-        http = httplib2.Http()
-        response, content = http.request(path, 'DELETE')
-        self.assertEqual(200, response.status)
-
-    def test_998_delete_initrd_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['ramdisk_id'])
-        http = httplib2.Http()
-        response, content = http.request(path, 'DELETE')
-        self.assertEqual(200, response.status)
-
-    def test_999_delete_image_from_glance_api(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['image_id'])
-        http = httplib2.Http()
-        response, content = http.request(path, 'DELETE')
-        self.assertEqual(200, response.status)
