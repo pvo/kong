@@ -20,13 +20,14 @@ import os
 from hashlib import md5
 
 TEST_DATA = {}
-
+TEST_NOVA = {}
 
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
-        global TEST_DATA
+        global TEST_DATA, TEST_NOVA
         self.glance = TEST_DATA
+	self.nova = TEST_NOVA
 
     def _md5sum_file(self, path):
         md5sum = md5()
