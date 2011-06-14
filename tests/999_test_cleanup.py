@@ -32,6 +32,7 @@ import tests
 TEST_HOST = "10.127.52.133"
 TEST_PORT = "9292"
 
+
 class TestCleanUp(tests.FunctionalTest):
     def test_997_delete_kernel_from_glance(self):
         path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])

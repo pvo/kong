@@ -22,12 +22,13 @@ from hashlib import md5
 TEST_DATA = {}
 TEST_NOVA = {}
 
+
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
         global TEST_DATA, TEST_NOVA
         self.glance = TEST_DATA
-	self.nova = TEST_NOVA
+        self.nova = TEST_NOVA
 
     def _md5sum_file(self, path):
         md5sum = md5()
@@ -36,7 +37,7 @@ class FunctionalTest(unittest.TestCase):
                 md5sum.update(chunk)
         return md5sum.hexdigest()
 
-    def _read_in_chunks(self, infile, chunk_size=1024*64):
+    def _read_in_chunks(self, infile, chunk_size=1024 * 64):
         file_data = open(infile, "rb")
         while True:
             # chunk = file_data.read(chunk_size).encode('base64')
