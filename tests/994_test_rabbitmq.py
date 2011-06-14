@@ -16,4 +16,24 @@
 #    under the License.
 
 """Functional test case to check RabbitMQ """
+import json
+import os
+import tempfile
+import unittest
+import httplib2
+import urllib
+import hashlib
+import time
+import pika
+
+from pprint import pprint
+
+import tests
+
+RABBITMQ_HOST = "10.127.52.128"
+
+class TestRabbitMQ(tests.FunctionalTest):
+    def test_001_connect(self):
+	connection = pika.BlockingConnection(pika.ConnectionParameters( host=RABBITMQ_HOST))
+	channel = connection.channel()
 

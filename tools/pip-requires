@@ -4,3 +4,4 @@ anyjson
 nose
 argparse
 httplib2
+pika
