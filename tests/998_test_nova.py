@@ -49,7 +49,7 @@ class TestNovaAPI(tests.FunctionalTest):
 		if (key == 'x-auth-token'):
 			self.nova['X-Auth-Token'] = val
 
-    def test_003_flavors(self):
+    def test_003_list_flavors_v1_1(self):
 	path = "http://%s:%s/%s/flavors" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
 	http = httplib2.Http()
 	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
@@ -58,7 +58,7 @@ class TestNovaAPI(tests.FunctionalTest):
 	self.assertEqual(200, response.status)
 	self.assertNotEqual('{"flavors": []}', content)
 
-    def test_004_kernel(self):
+    def test_004_verify_kernel_active_v1_1(self):
 	# Change 180 in the URL string to self.glance['kernel_id'] from the glance tests
 	path = "http://%s:%s/%s/images/180" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
 	http = httplib2.Http()
@@ -69,7 +69,7 @@ class TestNovaAPI(tests.FunctionalTest):
 	data = json.loads(content)
 	self.assertEqual(data['image']['status'], 'ACTIVE')
 
-    def test_005_ramdisk(self):
+    def test_005_verify_ramdisk_active_v1_1(self):
        # Change 181 in the URL string to self.glance['ramdisk_id'] from the glance tests
 	path = "http://%s:%s/%s/images/181" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
         http = httplib2.Http()
@@ -80,7 +80,7 @@ class TestNovaAPI(tests.FunctionalTest):
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
 
-    def test_006_images(self):
+    def test_006_verify_image_active_v1_1(self):
         # Change 182 in the URL string to self.glance['image_id']
 	path = "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
 	http = httplib2.Http()
