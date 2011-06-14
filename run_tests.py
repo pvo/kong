@@ -10,6 +10,7 @@ from nose import config
 from nose import result
 from nose import core
 
+
 class _AnsiColorizer(object):
     """
     A colorizer is an object that loosely wraps around a stream, allowing
@@ -122,6 +123,7 @@ class _NullColorizer(object):
     def write(self, text, color):
         self.stream.write(text)
 
+
 class OlympusTestResult(result.TextTestResult):
     def __init__(self, *args, **kw):
         result.TextTestResult.__init__(self, *args, **kw)
@@ -208,6 +210,7 @@ class OlympusTestResult(result.TextTestResult):
             self.stream.write(
                 '    %s' % str(test.test._testMethodName).ljust(60))
             self.stream.flush()
+
 
 class OlympusTestRunner(core.TextTestRunner):
     def _makeResult(self):
