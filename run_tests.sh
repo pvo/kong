@@ -21,6 +21,7 @@ function process_option {
     -V|--virtual-env) let always_venv=1; let never_venv=0;;
     -N|--no-virtual-env) let always_venv=0; let never_venv=1;;
     -f|--force) let force=1;;
+    -p|--pep8) let just_pep8=1;;
     *) noseargs="$noseargs $1"
   esac
 }
@@ -32,6 +33,7 @@ never_venv=0
 force=0
 noseargs=
 wrapper=""
+just_pep8=0
 
 for arg in "$@"; do
   process_option $arg
@@ -42,6 +44,13 @@ function run_tests {
   ${wrapper} $NOSETESTS 2> run_tests.err.log
 }
 
+function run_pep8 {
+  echo "Running pep8 ..."
+  PEP8_EXCLUDE=vcsversion.y
+  PEP8_OPTIONS="--exclude=$PEP8_EXCLUDE --repeat --show-pep8 --show-source"
+  PEP8_INCLUDE="tests tools run_tests.py"
+  ${wrapper} pep8 $PEP8_OPTIONS $PEP8_INCLUDE || exit 1
+}
 NOSETESTS="python run_tests.py $noseargs"
 
 if [ $never_venv -eq 0 ]
@@ -69,3 +78,10 @@ then
     fi
   fi
 fi
+
+if [ $just_pep8 -eq 1 ]; then
+    run_pep8
+    exit
+fi
+
+run_tests || exit
