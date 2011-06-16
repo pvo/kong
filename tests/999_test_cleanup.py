@@ -33,12 +33,15 @@ import tests
 TEST_HOST = "10.127.52.133"
 TEST_PORT = "9292"
 
+<<<<<<< HEAD
 # NOVA API TESTS Variables
 NOVA_API_HOST = "10.127.52.126"
 NOVA_API_PORT = "8774"
 NOVA_API_VER = "v1.1"
 NOVA_API_USER = "dashboard"
 NOVA_API_KEY = "ef81eccc-172c-4aad-810b-05278bbdbbf3"
+=======
+>>>>>>> 59980563e94c01f9b3abde938d6156076bbdb91b
 
 class TestCleanUp(tests.FunctionalTest):
     def test_996_delete_server(self):
