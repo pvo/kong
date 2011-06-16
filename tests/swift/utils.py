@@ -4,15 +4,17 @@ import sys
 from httplib import HTTPException, HTTPConnection, HTTPSConnection
 from time import sleep
 from urlparse import urlparse, urlunparse
+from tests.config import get_config
+
 
 conf = {
-    'auth_host': "10.127.52.134",
-    'auth_port': "443",
-    'auth_prefix': "/auth/",
-    'auth_ssl': "yes",
-    'account': 'system',
-    'username': 'root',
-    'password': 'citrix',
+    'auth_host': get_config('swift/auth_host'),
+    'auth_port': get_config('swift/auth_port'),
+    'auth_prefix': get_config('swift/auth_prefix'),
+    'auth_ssl': get_config('swift/auth_ssl'),
+    'account': get_config('swift/account'),
+    'username': get_config('swift/username'),
+    'password': get_config('swift/password'),
 }
 
 # If no conf was read, we will fall back to old school env vars
@@ -85,7 +87,7 @@ if conf:
 
 skip = not all([swift_test_auth, swift_test_user[0], swift_test_key[0]])
 if skip:
-    print >>sys.stderr, 'SKIPPING FUNCTIONAL TESTS DUE TO NO CONFIG'
+    print >> sys.stderr, 'SKIPPING FUNCTIONAL TESTS DUE TO NO CONFIG'
 
 
 class AuthError(Exception):
@@ -152,10 +154,10 @@ def retry(func, *args, **kwargs):
             if attempts > retries:
                 raise
             parsed[use_account] = conn[use_account] = None
-        except AuthError, _:
+        except AuthError:
             url[use_account] = token[use_account] = None
             continue
-        except InternalServerError, _:
+        except InternalServerError:
             pass
         if attempts <= retries:
             sleep(backoff)

@@ -28,9 +28,10 @@ import hashlib
 from pprint import pprint
 
 import tests
+from tests.config import get_config
 
-TEST_HOST = "10.127.52.133"
-TEST_PORT = "9292"
+TEST_HOST = get_config("glance/host")
+TEST_PORT = get_config("glance/port")
 
 
 class TestCleanUp(tests.FunctionalTest):

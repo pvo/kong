@@ -30,11 +30,16 @@ from pprint import pprint
 
 import tests
 
-NOVA_API_HOST = "10.127.52.126"
-NOVA_API_PORT = "8774"
-NOVA_API_VER = "v1.1"
-NOVA_API_USER = "dashboard"
-NOVA_API_KEY = "ef81eccc-172c-4aad-810b-05278bbdbbf3"
+from tests.config import get_config
+
+# Need to do something smarter on importing the connection information
+# like line #96 of nova-trunk/smoketests/base.py
+NOVA_API_HOST = get_config("nova/host")
+NOVA_API_PORT = get_config("nova/port")
+NOVA_API_VER = get_config("nova/apiver")
+NOVA_API_USER = get_config("nova/user")
+NOVA_API_KEY = get_config("nova/key")
+
 
 class TestNovaAPI(tests.FunctionalTest):
     def test_001_verify_nova_auth(self):

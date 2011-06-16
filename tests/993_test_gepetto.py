@@ -28,5 +28,6 @@ import time
 from pprint import pprint
 
 import tests
+from tests.config import get_config
 
-GEPPETTO_HOST = "10.127.52.120"
+GEPPETTO_HOST = get_config("gepeto/host")
