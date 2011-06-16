@@ -61,7 +61,7 @@ class TestNovaAPI(tests.FunctionalTest):
 
     def test_004_verify_kernel_active_v1_1(self):
 	# Change 180 in the URL string to self.glance['kernel_id'] from the glance tests
-	path = "http://%s:%s/%s/images/180" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+	path = "http://%s:%s/%s/images/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.glance['kernel_id'])
 	http = httplib2.Http()
 	headers = {'X-Auth-User': '%s' % (NOVA_API_USER),
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
@@ -72,7 +72,7 @@ class TestNovaAPI(tests.FunctionalTest):
 
     def test_005_verify_ramdisk_active_v1_1(self):
        # Change 181 in the URL string to self.glance['ramdisk_id'] from the glance tests
-	path = "http://%s:%s/%s/images/181" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+	path = "http://%s:%s/%s/images/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.glance['ramdisk_id'])
         http = httplib2.Http()
         headers = {'X-Auth-User': '%s' % (NOVA_API_USER),
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
@@ -83,7 +83,7 @@ class TestNovaAPI(tests.FunctionalTest):
 
     def test_006_verify_image_active_v1_1(self):
         # Change 182 in the URL string to self.glance['image_id']
-	path = "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+	path = "http://%s:%s/%s/images/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.glance['image_id'])
 	http = httplib2.Http()
 	headers = {'X-Auth-User': '%s' % (NOVA_API_USER),
 		   'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
@@ -104,7 +104,7 @@ class TestNovaAPI(tests.FunctionalTest):
 			{
 				"name": "testing server creation",
    				"flavorRef": "http://%s:%s/%s/flavors/3" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER),
-   				"imageRef": "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+   				"imageRef": "http://%s:%s/%s/images/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.glance['image_id'])
    			}
 		    }
         data = json.dumps(json_str)
@@ -151,7 +151,7 @@ class TestNovaAPI(tests.FunctionalTest):
                         {
                                 "name" : "test %s" % (i),
                                 "flavorRef" : "http://%s:%s/%s/flavors/3" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER),
-                                "imageRef" : "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+                                "imageRef" : "http://%s:%s/%s/images/%s" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.glance['image_id'])
                         }
                 }
 		data = json.dumps(json_str)
