@@ -18,17 +18,20 @@
 import unittest
 import os
 from hashlib import md5
+from dns import resolver
 
 TEST_DATA = {}
 TEST_NOVA = {}
-
+OLYMPUS_HOSTS = {}
 
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
-        global TEST_DATA, TEST_NOVA
+        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS
         self.glance = TEST_DATA
         self.nova = TEST_NOVA
+	self.resolver = resolver.Resolver(filename='etc/resolv.conf', configure=True)
+	self.hosts = OLYMPUS_HOSTS
 
     def _md5sum_file(self, path):
         md5sum = md5()

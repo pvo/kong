@@ -26,7 +26,6 @@ import hashlib
 import time
 import xmlrpclib
 import dns
-
 from pprint import pprint
 
 import tests
@@ -40,4 +39,9 @@ class TestGeppetto(tests.FunctionalTest):
     def test_001_connect(self):
 	url = "http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH)
 	geppetto_srv = xmlrpclib.ServerProxy(url)
-	pprint(geppetto_srv.get_nodes())
+
+	for key,val in geppetto_srv.get_nodes():
+		query = self.resolver.query(key, raise_on_no_answer=True)
+		self.hosts[key] = query[0].address
+
+	print self.hosts
