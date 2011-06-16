@@ -122,7 +122,6 @@ class TestNovaAPI(tests.FunctionalTest):
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
-<<<<<<< HEAD
         data = json.loads(content)
         while (data['server']['status'] != 'ACTIVE'):
             response, content = http.request(path, 'GET', headers=headers)
@@ -130,7 +129,6 @@ class TestNovaAPI(tests.FunctionalTest):
             time.sleep(10)
             count = count + 10
         self.assertEqual(data['server']['status'], "ACTIVE")
-=======
 	data = json.loads(content)
 	while ( data['server']['status'] != 'ACTIVE' ):
 		response, content = http.request(path, 'GET', headers=headers)
@@ -162,4 +160,3 @@ class TestNovaAPI(tests.FunctionalTest):
 		self.assertEqual(200, response.status)
 		self.assertEqual(json_return['server']['status'], "BUILD")
 
->>>>>>> jason
