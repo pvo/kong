@@ -25,6 +25,7 @@ import urllib
 import hashlib
 import time
 import xmlrpclib
+import dns
 
 from pprint import pprint
 
@@ -37,5 +38,6 @@ GEPPETTO_PATH = get_config("gepeto/path")
 
 class TestGeppetto(tests.FunctionalTest):
     def test_001_connect(self):
-	geppetto_srv = xmlrpclib.Server("http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH))
-	pprint(geppetto_srv.system.listMethods())
+	url = "http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH)
+	geppetto_srv = xmlrpclib.ServerProxy(url)
+	pprint(geppetto_srv.get_nodes())
