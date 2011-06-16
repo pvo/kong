@@ -134,3 +134,34 @@ class TestNovaAPI(tests.FunctionalTest):
             time.sleep(10)
             count = count + 10
         self.assertEqual(data['server']['status'], "ACTIVE")
+	data = json.loads(content)
+	while ( data['server']['status'] != 'ACTIVE' ):
+		response, content = http.request(path, 'GET', headers=headers)
+		data = json.loads(content)
+		time.sleep(10)
+		count = count + 10
+	self.assertEqual(data['server']['status'], "ACTIVE")
+
+    def test_009_create_multiple(self):
+	path = "http://%s:%s/%s/servers" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+        http = httplib2.Http()
+        headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']),
+                   'Content-Type' : 'application/json' }
+
+	for i in range(1,10):
+		print i
+		# Change imageRef to self.glance['image_id']
+        	json_str = { "server" :
+                        {
+                                "name" : "test %s" % (i),
+                                "flavorRef" : "http://%s:%s/%s/flavors/3" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER),
+                                "imageRef" : "http://%s:%s/%s/images/182" % (NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER)
+                        }
+                }
+		data = json.dumps(json_str)
+		response,content = http.request(path, 'POST', headers=headers, body=data)
+		json_return = json.loads(content)
+		self.assertEqual(200, response.status)
+		self.assertEqual(json_return['server']['status'], "BUILD")
+

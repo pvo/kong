@@ -22,30 +22,9 @@ import tests
 from tests.config import get_config
 RABBITMQ_HOST = get_config("rabbitmq/host")
 
-
 class TestRabbitMQ(tests.FunctionalTest):
     def test_001_connect(self):
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=RABBITMQ_HOST))
-        channel = connection.channel()
-        channel.queue_declare(queue="compute",
-                              durable=True,
-                              exclusive=False,
-                              auto_delete=False)
-        messages = 0
-
-        def _on_message(channel, method, header, body):
-            global messages
-
-            print "Message:"
-            print "\t%r" % method
-            print "\t%r" % header
-            print "\t%r" % body
-            channel.basic_ack(method.delivery_tag)
-
-            messages += 1
-            if messages > 10:
-                channel.stop_consuming()
-        channel.basic_consume(_on_message, queue="compute")
-        channel.start_consuming()
+	creds = pika.credentials.PlainCredentials('guest', '')
+	parameters = pika.ConnectionParameters(credentials=creds,
+					       host=RABBITMQ_HOST,
+					       virtual_host='/')

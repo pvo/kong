@@ -24,6 +24,7 @@ import httplib2
 import urllib
 import hashlib
 import time
+import xmlrpclib
 
 from pprint import pprint
 
@@ -31,3 +32,10 @@ import tests
 from tests.config import get_config
 
 GEPPETTO_HOST = get_config("gepeto/host")
+GEPPETTO_PORT = get_config("gepeto/port")
+GEPPETTO_PATH = get_config("gepeto/path")
+
+class TestGeppetto(tests.FunctionalTest):
+    def test_001_connect(self):
+	geppetto_srv = xmlrpclib.Server("http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH))
+	pprint(geppetto_srv.system.listMethods())

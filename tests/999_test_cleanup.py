@@ -30,11 +30,27 @@ from pprint import pprint
 import tests
 from tests.config import get_config
 
+# GLANCE API TESTS Variables
 TEST_HOST = get_config("glance/host")
 TEST_PORT = get_config("glance/port")
 
+# NOVA API TESTS Variables
+NOVA_API_HOST = get_config("nova/host")
+NOVA_API_PORT = get_config("nova/port")
+NOVA_API_VER = get_config("nova/apiver")
+NOVA_API_USER = get_config("nova/user")
+NOVA_API_KEY = get_config("nova/key")
+
 
 class TestCleanUp(tests.FunctionalTest):
+    def test_996_delete_server(self):
+	path = "http://%s:%s/%s/servers/%s" % ( NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.nova['server_id'])
+	http = httplib2.Http()
+	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
+                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
+	response, content = http.request(path, 'DELETE', headers=headers)
+	self.assertEqual(204, response.status)
+	
     def test_997_delete_kernel_from_glance(self):
         path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
         http = httplib2.Http()
