@@ -15,13 +15,16 @@ class TestAccount(unittest.TestCase):
     def test_metadata(self):
         if skip:
             raise SkipTest
+
         def post(url, token, parsed, conn, value):
             conn.request('POST', parsed.path, '',
                 {'X-Auth-Token': token, 'X-Account-Meta-Test': value})
             return check_response(conn)
+
         def head(url, token, parsed, conn):
             conn.request('HEAD', parsed.path, '', {'X-Auth-Token': token})
             return check_response(conn)
+
         def get(url, token, parsed, conn):
             conn.request('GET', parsed.path, '', {'X-Auth-Token': token})
             return check_response(conn)
@@ -51,10 +54,12 @@ class TestAccount(unittest.TestCase):
     def test_multi_metadata(self):
         if skip:
             raise SkipTest
+
         def post(url, token, parsed, conn, name, value):
             conn.request('POST', parsed.path, '',
                          {'X-Auth-Token': token, name: value})
             return check_response(conn)
+
         def head(url, token, parsed, conn):
             conn.request('HEAD', parsed.path, '', {'X-Auth-Token': token})
             return check_response(conn)
@@ -77,6 +82,7 @@ class TestAccount(unittest.TestCase):
     def test_bad_metadata(self):
         if skip:
             raise SkipTest
+
         def post(url, token, parsed, conn, extra_headers):
             headers = {'X-Auth-Token': token}
             headers.update(extra_headers)

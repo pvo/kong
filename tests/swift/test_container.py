@@ -14,6 +14,7 @@ class TestContainer(unittest.TestCase):
 
     def setUp(self):
         self.name = uuid4().hex
+
         def put(url, token, parsed, conn):
             conn.request('PUT', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token})
@@ -27,6 +28,7 @@ class TestContainer(unittest.TestCase):
             conn.request('GET', parsed.path + '/' + self.name + '?format=json',
                          '', {'X-Auth-Token': token})
             return check_response(conn)
+
         def delete(url, token, parsed, conn, obj):
             conn.request('DELETE',
                          '/'.join([parsed.path, self.name, obj['name']]), '',
@@ -43,6 +45,7 @@ class TestContainer(unittest.TestCase):
                 resp = retry(delete, obj)
                 resp.read()
                 self.assertEquals(resp.status, 204)
+
         def delete(url, token, parsed, conn):
             conn.request('DELETE', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token})
@@ -56,6 +59,7 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/' + self.name, '',
                 {'X-Auth-Token': token, name: value})
             return check_response(conn)
+
         def head(url, token, parsed, conn):
             conn.request('HEAD', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token})
@@ -81,14 +85,17 @@ class TestContainer(unittest.TestCase):
             conn.request('PUT', parsed.path + '/' + name, '',
                 {'X-Auth-Token': token, 'X-Container-Meta-Test': value})
             return check_response(conn)
+
         def head(url, token, parsed, conn, name):
             conn.request('HEAD', parsed.path + '/' + name, '',
                          {'X-Auth-Token': token})
             return check_response(conn)
+
         def get(url, token, parsed, conn, name):
             conn.request('GET', parsed.path + '/' + name, '',
                          {'X-Auth-Token': token})
             return check_response(conn)
+
         def delete(url, token, parsed, conn, name):
             conn.request('DELETE', parsed.path + '/' + name, '',
                          {'X-Auth-Token': token})
@@ -130,10 +137,12 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/' + self.name, '',
                 {'X-Auth-Token': token, 'X-Container-Meta-Test': value})
             return check_response(conn)
+
         def head(url, token, parsed, conn):
             conn.request('HEAD', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token})
             return check_response(conn)
+
         def get(url, token, parsed, conn):
             conn.request('GET', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token})
@@ -164,6 +173,7 @@ class TestContainer(unittest.TestCase):
             headers.update(extra_headers)
             conn.request('PUT', parsed.path + '/' + name, '', headers)
             return check_response(conn)
+
         def delete(url, token, parsed, conn, name):
             conn.request('DELETE', parsed.path + '/' + name, '',
                          {'X-Auth-Token': token})
@@ -317,6 +327,7 @@ class TestContainer(unittest.TestCase):
             raise Exception('Should not have been able to GET')
         except Exception, err:
             self.assert_(str(err).startswith('No result after '), err)
+
         def post(url, token, parsed, conn):
             conn.request('POST', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token,
@@ -328,6 +339,7 @@ class TestContainer(unittest.TestCase):
         resp = retry(get)
         resp.read()
         self.assertEquals(resp.status, 204)
+
         def post(url, token, parsed, conn):
             conn.request('POST', parsed.path + '/' + self.name, '',
                          {'X-Auth-Token': token, 'X-Container-Read': ''})

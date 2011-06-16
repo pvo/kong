@@ -44,27 +44,32 @@ NOVA_API_KEY = get_config("nova/key")
 
 class TestCleanUp(tests.FunctionalTest):
     def test_996_delete_server(self):
-	path = "http://%s:%s/%s/servers/%s" % ( NOVA_API_HOST, NOVA_API_PORT, NOVA_API_VER, self.nova['server_id'])
-	http = httplib2.Http()
-	headers = {'X-Auth-User' : '%s' % (NOVA_API_USER),
-                   'X-Auth-Token' : '%s' % (self.nova['X-Auth-Token']) }
-	response, content = http.request(path, 'DELETE', headers=headers)
-	self.assertEqual(204, response.status)
-	
+        path = "http://%s:%s/%s/servers/%s" % (NOVA_API_HOST,
+                        NOVA_API_PORT, NOVA_API_VER,
+                        self.nova['server_id'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': '%s' % (NOVA_API_USER),
+                   'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
+        response, content = http.request(path, 'DELETE', headers=headers)
+        self.assertEqual(204, response.status)
+
     def test_997_delete_kernel_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['kernel_id'])
+        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+                                           self.glance['kernel_id'])
         http = httplib2.Http()
         # response, content = http.request(path, 'DELETE')
         # self.assertEqual(200, response.status)
 
     def test_998_delete_initrd_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['ramdisk_id'])
+        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+                                           self.glance['ramdisk_id'])
         http = httplib2.Http()
         # response, content = http.request(path, 'DELETE')
         # self.assertEqual(200, response.status)
 
     def test_999_delete_image_from_glance_api(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT, self.glance['image_id'])
+        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+                                           self.glance['image_id'])
         http = httplib2.Http()
         # response, content = http.request(path, 'DELETE')
         # self.assertEqual(200, response.status)
