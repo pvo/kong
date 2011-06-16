@@ -22,9 +22,10 @@ import tests
 from tests.config import get_config
 RABBITMQ_HOST = get_config("rabbitmq/host")
 
+
 class TestRabbitMQ(tests.FunctionalTest):
     def test_001_connect(self):
-	creds = pika.credentials.PlainCredentials('guest', '')
-	parameters = pika.ConnectionParameters(credentials=creds,
-					       host=RABBITMQ_HOST,
-					       virtual_host='/')
+        creds = pika.credentials.PlainCredentials('guest', '')
+        self.assert_(pika.ConnectionParameters(credentials=creds,
+                                               host=RABBITMQ_HOST,
+                                               virtual_host='/'))
