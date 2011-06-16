@@ -24,9 +24,17 @@ import httplib2
 import urllib
 import hashlib
 import time
+import xmlrpclib
 
 from pprint import pprint
 
 import tests
 
 GEPPETTO_HOST = "10.127.52.120"
+GEPPETTO_PORT = "8080"
+GEPPETTO_PATH = "openstack/geppetto"
+
+class TestGeppetto(tests.FunctionalTest):
+    def test_001_connect(self):
+	geppetto_srv = xmlrpclib.Server("http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH))
+	pprint(geppetto_srv.system.listMethods())
