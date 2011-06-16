@@ -5,3 +5,4 @@ nose
 argparse
 httplib2
 pika
+dnspython
