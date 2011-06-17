@@ -25,15 +25,18 @@ from tests.config import get_config
 import tests
 # from tests.utils import execute
 
-# Need to do something smarter on importing the connection information
-# like line #96 of nova-trunk/smoketests/base.py
-TEST_HOST = get_config("glance/host")
-TEST_PORT = get_config("glance/port")
-
 
 class TestGlanceAPI(tests.FunctionalTest):
+    def test_000_ghetto_fixup_variables(self):
+        """
+        This sets the host and port self variables so they
+        are accessible by all other methods
+        """
+        self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
+        self.glance['port'] = self.hosts['openstack-glance-api']['port']
+
     def test_001_connect_to_glance_api(self):
-        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+        path = "http://%s:%s/images" % (self.glance['host'], self.glance['port'])
         http = httplib2.Http()
         response, content = http.request(path, 'GET')
         self.assertEqual(200, response.status)
@@ -43,7 +46,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         kernel = "sample_vm/vmlinuz-2.6.32-23-server"
         # md5sum = self._md5sum_file(kernel)
         # content_length = os.path.getsize(kernel)
-        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+        path = "http://%s:%s/images" % (self.glance['host'], self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-kernel',
                    'x-image-meta-disk-format': 'aki',
@@ -65,7 +68,7 @@ class TestGlanceAPI(tests.FunctionalTest):
 
     def test_003_upload_initrd_to_glance(self):
         initrd = "sample_vm/initrd.img-2.6.32-23-server"
-        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+        path = "http://%s:%s/images" % (self.glance['host'], self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-ramdisk',
                    'x-image-meta-disk-format': 'ari',
@@ -91,7 +94,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         upload_data = ""
         for chunk in self._read_in_chunks(image):
             upload_data += chunk
-        path = "http://%s:%s/images" % (TEST_HOST, TEST_PORT)
+        path = "http://%s:%s/images" % (self.glance['host'], self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-image',
                    'x-image-meta-disk-format': 'ami',
