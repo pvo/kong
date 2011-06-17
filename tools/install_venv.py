@@ -5,6 +5,8 @@ Installation script for Olympus's testing virtualenv
 """
 
 import os
+import stat
+import string
 import subprocess
 import sys
 
@@ -16,6 +18,23 @@ PIP_REQUIRES = os.path.join(ROOT, 'tools', 'pip-requires')
 def die(message, *args):
     print >> sys.stderr, message % args
     sys.exit(1)
+
+
+def whereis(executable):
+    """
+    Detect whereis a binary and make sure it's executable we can execute.
+    """
+    for d in string.split(os.environ['PATH'], \
+                              os.pathsep):
+        f = os.path.join(d, executable)
+        if os.path.isfile(f):
+            try:
+                st = os.stat(f)
+            except OSError:
+                continue
+            if stat.S_IMODE(st[stat.ST_MODE]) & 0111:
+                return True
+    return False
 
 
 def run_command(cmd, redirect_output=True, check_exit_code=True):
@@ -35,10 +54,8 @@ def run_command(cmd, redirect_output=True, check_exit_code=True):
     return output
 
 
-HAS_EASY_INSTALL = bool(run_command(['which', 'easy_install'],
-                                    check_exit_code=False).strip())
-HAS_VIRTUALENV = bool(run_command(['which', 'virtualenv'],
-                                    check_exit_code=False).strip())
+HAS_EASY_INSTALL = bool(whereis("easy_install"))
+HAS_VIRTUALENV = bool(whereis("virtualenv"))
 
 
 def check_dependencies():
@@ -49,7 +66,7 @@ def check_dependencies():
         # Try installing it via easy_install...
         if HAS_EASY_INSTALL:
             print 'Installing virtualenv via easy_install...',
-            if not run_command(['which', 'easy_install']):
+            if not run_command(['easy_install', 'virtualenv']):
                 die('ERROR: virtualenv not found.\n\n'
                     'Glance development requires virtualenv, please install'
                     ' it using your favorite package management tool')
