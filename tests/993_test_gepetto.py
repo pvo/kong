@@ -35,9 +35,9 @@ from pprint import pprint
 import tests
 from tests.config import get_config
 
-GEPPETTO_HOST = get_config("gepeto/host")
-GEPPETTO_PORT = get_config("gepeto/port")
-GEPPETTO_PATH = get_config("gepeto/path")
+GEPPETTO_HOST = get_config("geppetto/host")
+GEPPETTO_PORT = get_config("geppetto/port")
+GEPPETTO_PATH = get_config("geppetto/path")
 
 
 class TestGeppetto(tests.FunctionalTest):
