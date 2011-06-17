@@ -6,3 +6,4 @@ argparse
 httplib2
 pika
 dnspython
+ipython
