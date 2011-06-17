@@ -51,7 +51,7 @@ function run_pep8 {
   PEP8_INCLUDE="tests tools run_tests.py"
   ${wrapper} pep8 $PEP8_OPTIONS $PEP8_INCLUDE || exit 1
 }
-NOSETESTS="python run_tests.py $noseargs"
+NOSETESTS="env python run_tests.py $noseargs"
 
 if [ $never_venv -eq 0 ]
 then
@@ -65,14 +65,14 @@ then
   else
     if [ $always_venv -eq 1 ]; then
       # Automatically install the virtualenv
-      python tools/install_venv.py
+      env python tools/install_venv.py
       wrapper="${with_venv}"
     else
       echo -e "No virtual environment found...create one? (Y/n) \c"
       read use_ve
       if [ "x$use_ve" = "xY" -o "x$use_ve" = "x" -o "x$use_ve" = "xy" ]; then
         # Install the virtualenv and run the test suite in it
-        python tools/install_venv.py
+        env python tools/install_venv.py
                     wrapper=${with_venv}
       fi
     fi
