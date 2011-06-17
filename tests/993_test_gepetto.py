@@ -15,7 +15,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Functional test case to check the status of gepetto and set information of hosts etc.. """
+"""
+Functional test case to check the status of gepetto and
+set information of hosts etc..
+"""
+
 import json
 import os
 import tempfile
@@ -35,13 +39,14 @@ GEPPETTO_HOST = get_config("gepeto/host")
 GEPPETTO_PORT = get_config("gepeto/port")
 GEPPETTO_PATH = get_config("gepeto/path")
 
+
 class TestGeppetto(tests.FunctionalTest):
     def test_001_connect(self):
-	url = "http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH)
-	geppetto_srv = xmlrpclib.ServerProxy(url)
+        url = "http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH)
+        geppetto_srv = xmlrpclib.ServerProxy(url)
 
-	for key,val in geppetto_srv.get_nodes():
-		query = self.resolver.query(key, raise_on_no_answer=True)
-		self.hosts[key] = query[0].address
+        for key, val in geppetto_srv.get_nodes():
+            query = self.resolver.query(key, raise_on_no_answer=True)
+            self.hosts[key] = query[0].address
 
-	print self.hosts
+        print self.hosts
