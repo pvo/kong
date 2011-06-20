@@ -44,15 +44,18 @@ class FunctionalTest(unittest.TestCase):
         # pprint(self.hosts)
 
     def _find_geppetto_api_endpoints(self):
-        self.roles = ['openstack-glance-api', 'openstack-nova-api', 'openstack-swift-proxy', 'rabbitmq-server']
+        self.roles = ['openstack-glance-api', 'openstack-nova-api',
+                      'openstack-swift-proxy', 'rabbitmq-server']
         self.hosts['roles'] = self.roles
-        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080, '/openstack/geppetto'))
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
         for role in self.roles:
             self.hosts[role] = {}
             if server.role_has_node(role):
                 self.hosts[role]['host'] = []
                 for entry in server.get_nodes_in_role(role):
-                    query = self.resolver.query(entry[0], raise_on_no_answer=True)
+                    query = self.resolver.query(entry[0],
+                                 raise_on_no_answer=True)
                     self.hosts[role]['host'].append(query[0].address)
             else:
                 print 'Role [%s] has no member nodes' % role
