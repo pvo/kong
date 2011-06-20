@@ -32,6 +32,8 @@ class TestGlanceAPI(tests.FunctionalTest):
         This sets the host and port self variables so they
         are accessible by all other methods
         """
+        # self.glance['host'] = get_config("glance/host")
+        # self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
 
