@@ -28,25 +28,53 @@ import httplib2
 import urllib
 import hashlib
 import time
-import xmlrpclib
 import dns
+from xmlrpclib import Server
 from pprint import pprint
 
 import tests
 from tests.config import get_config
 
-GEPPETTO_HOST = get_config("geppetto/host")
-GEPPETTO_PORT = get_config("geppetto/port")
-GEPPETTO_PATH = get_config("geppetto/path")
+# GEPPETTO_HOST = get_config("geppetto/host")
+# GEPPETTO_PORT = get_config("geppetto/port")
+# GEPPETTO_PATH = get_config("geppetto/path")
 
 
 class TestGeppetto(tests.FunctionalTest):
-    def test_001_connect(self):
-        url = "http://%s:%s/%s" % (GEPPETTO_HOST, GEPPETTO_PORT, GEPPETTO_PATH)
-        geppetto_srv = xmlrpclib.ServerProxy(url)
+    def test_001_get_nodes(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
+        self.assertTrue(server.get_nodes())
 
+    def test_002_get_nodes_in_role(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
+        self.assertTrue(server.get_nodes_in_role('os-vpx-nova-manage'),
+            'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+
+    def test_003_get_nodes_not_in_role(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
+        # self.assertTrue(server.get_nodes_not_in_role('mysql'))
+        node_list = server.get_nodes_not_in_role('os-vpx-nova-manage')
+        self.assertFalse(node_list, 'Should not return any vpxs, '
+            'currently returning: %s' % len(node_list))
+
+    def test_004_role_has_node(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
+        self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
+            'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+
+    def test_005_minimum_roles_for_deployment(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
+
+    def test_010_dns_resolution_is_working(self):
+        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
+                        '/openstack/geppetto'))
         for key, val in geppetto_srv.get_nodes():
             query = self.resolver.query(key, raise_on_no_answer=True)
-            self.hosts[key] = query[0].address
+            # self.hosts[key] = query[0].address
 
         print self.hosts
