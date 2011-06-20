@@ -41,10 +41,10 @@ class FunctionalTest(unittest.TestCase):
         self.geppetto_host = os.getenv('GEPPETTO_HOST')
         if os.getenv('OFFLINE_MODE'):
             self._fake_geppetto()
-        else: 
+        else:
             self._find_geppetto_api_endpoints()
             self._parse_defaults_file()
-        pprint(self.hosts)
+        # pprint(self.hosts)
 
     def _find_geppetto_api_endpoints(self):
         self.roles = ['openstack-glance-api', 'openstack-nova-api',
