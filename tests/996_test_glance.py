@@ -20,6 +20,7 @@
 import json
 import os
 import httplib2
+from pprint import pprint
 from tests.config import get_config
 
 import tests
@@ -36,6 +37,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         # self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
+        print "HOST: %s\nPORT: %s" % (self.glance['host'], self.glance['port'])
 
     def test_001_connect_to_glance_api(self):
         path = "http://%s:%s/images" % (self.glance['host'],
@@ -63,8 +65,8 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
+        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
-        # pprint(content)
         data = json.loads(content)
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
@@ -87,8 +89,8 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
+        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
-        # pprint(content)
         data = json.loads(content)
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
