@@ -26,18 +26,20 @@ from pprint import pprint
 TEST_DATA = {}
 TEST_NOVA = {}
 OLYMPUS_HOSTS = {}
+MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
 
 
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
-        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS
+        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER
         self.glance = TEST_DATA
         self.nova = TEST_NOVA
         self.resolver = resolver.Resolver(filename='etc/resolv.conf',
                                           configure=True)
         self.hosts = OLYMPUS_HOSTS
+        self.multi_server = MULTI_SERVER
         self.geppetto_host = os.getenv('GEPPETTO_HOST')
         if os.getenv('OFFLINE_MODE'):
             self._fake_geppetto()

@@ -117,7 +117,7 @@ class TestNovaAPI(tests.FunctionalTest):
         # for testing purposes change self.glance['kernel_id'] to an active
         # kernel image allow for skipping glance tests
         if not 'kernel_id' in self.glance:
-            self.glance['kernel_id'] = "237"
+            self.glance['kernel_id'] = "243"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -135,7 +135,7 @@ class TestNovaAPI(tests.FunctionalTest):
         # for testing purposes change self.glance['ramdisk_id'] to an active
         # ramdisk image, allows you to skip glance tests
         if not 'ramdisk_id' in self.glance:
-            self.glance['ramdisk_id'] = "238"
+            self.glance['ramdisk_id'] = "244"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -153,7 +153,7 @@ class TestNovaAPI(tests.FunctionalTest):
         # for testing purposes change self.glance['image_id'] to an active
         # image id allows for skipping glance tests
         if not 'image_id' in self.glance:
-            self.glance['image_id'] = "239"
+            self.glance['image_id'] = "245"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -201,35 +201,39 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(build_result['status'], "ACTIVE")
         self.assertEqual(build_result['ping'], True)
 
-    # def test_009_create_multiple(self):
-        # path = "http://%s:%s/%s/servers" % (self.nova['host'],
-                                            # self.nova['port'],
-                                            # self.nova['ver'])
-        # http = httplib2.Http()
-        # headers = {'X-Auth-User': '%s' % (self.nova['user']),
-                   # 'X-Auth-Token': '%s' % (self.nova['X-Auth-Token']),
-                   # 'Content-Type': 'application/json'}
+    def test_009_create_multiple(self):
+        path = "http://%s:%s/%s/servers" % (self.nova['host'],
+                                            self.nova['port'],
+                                            self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': '%s' % (self.nova['user']),
+                   'X-Auth-Token': '%s' % (self.nova['X-Auth-Token']),
+                   'Content-Type': 'application/json'}
 
-        # for i in range(1, 10):
-            # print i
+        print self.nova['host']
+
+        for i in range(1, 10):
+            print i
             # Change imageRef to self.glance['image_id']
-            # json_str = {"server":
-                # {
-                    # "name": "test %s" % (i),
-                    # "flavorRef": "http://%s:%s/%s/flavors/3" % (
-                                                   # self.nova['host'],
-                                                   # self.nova['port'],
-                                                   # self.nova['ver']),
-                    # "imageRef": "http://%s:%s/%s/images/%s" % (
-                                                   # self.nova['host'],
-                                                   # self.nova['port'],
-                                                   # self.nova['ver'],
-                                                   # self.glance['image_id'])
-                # }
-            # }
-            # data = json.dumps(json_str)
-            # response, content = http.request(path, 'POST', headers=headers,
-                                             # body=data)
-            # json_return = json.loads(content)
-            # self.assertEqual(200, response.status)
-            # self.assertEqual(json_return['server']['status'], "BUILD")
+            json_str = {"server":
+                {
+                    "name": "test %s" % (i),
+                    "flavorRef": "http://%s:%s/%s/flavors/3" % (
+                                                   self.nova['host'],
+                                                   self.nova['port'],
+                                                   self.nova['ver']),
+                    "imageRef": "http://%s:%s/%s/images/%s" % (
+                                                   self.nova['host'],
+                                                   self.nova['port'],
+                                                   self.nova['ver'],
+                                                   self.glance['image_id'])
+                }
+            }
+            data = json.dumps(json_str)
+            response, content = http.request(path, 'POST', headers=headers,
+                                             body=data)
+            json_return = json.loads(content)
+            self.assertEqual(200, response.status)
+            self.assertEqual(json_return['server']['status'], "BUILD")
+            self.multi_server["test %s" % (i)] = json_return['server']['id']
+            # print multi_server[json_return['server']['name']
