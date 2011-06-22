@@ -37,7 +37,6 @@ class TestGlanceAPI(tests.FunctionalTest):
         # self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
-        print "HOST: %s\nPORT: %s" % (self.glance['host'], self.glance['port'])
 
     def test_001_connect_to_glance_api(self):
         path = "http://%s:%s/images" % (self.glance['host'],

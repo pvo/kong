@@ -38,7 +38,10 @@ class FunctionalTest(unittest.TestCase):
         self.resolver = resolver.Resolver(filename='etc/resolv.conf',
                                           configure=True)
         self.hosts = OLYMPUS_HOSTS
-        self.geppetto_host = os.getenv('GEPPETTO_HOST')
+        self.hosts['geppetto'] = {}
+        self.hosts['geppetto']['host'] = os.getenv('GEPPETTO_HOST')
+        self.hosts['geppetto']['port'] = os.getenv('GEPPETTO_PORT')
+        self.hosts['geppetto']['path'] = os.getenv('GEPPETTO_PATH')
         if os.getenv('OFFLINE_MODE'):
             self._fake_geppetto()
         else:
@@ -50,8 +53,8 @@ class FunctionalTest(unittest.TestCase):
         self.roles = ['openstack-glance-api', 'openstack-nova-api',
                       'openstack-swift-proxy', 'rabbitmq-server']
         self.hosts['roles'] = self.roles
-        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080,
-                        '/openstack/geppetto'))
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'], self.hosts['geppetto']['path']))
         for role in self.roles:
             self.hosts[role] = {}
             if server.role_has_node(role):
@@ -108,8 +111,9 @@ class FunctionalTest(unittest.TestCase):
         parser.read(config_file)
 
         for section in parser.sections():
-            # pprint(section)
-            for value in parser.options(section):
-                if section in self.hosts:
+            if section in self.hosts:
+                # pprint(section)
+                for value in parser.options(section):
                     self.hosts[section][value] = parser.get(section, value)
                     # print "%s = %s" % (value, parser.get(section, value))
+                
