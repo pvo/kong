@@ -45,7 +45,7 @@ class TestCleanUp(tests.FunctionalTest):
         headers = {'X-Auth-User': '%s' % (self.nova['user']),
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
-        self.assertEqual(204, response.status)
+        self.assertEqual(202, response.status)
 
     def test_996_delete_multi_server(self):
         for k, v in self.multi_server.iteritems():
@@ -57,7 +57,7 @@ class TestCleanUp(tests.FunctionalTest):
             headers = {'X-Auth-User': '%s' % (self.nova['user']),
                        'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
             response, content = http.request(path, 'DELETE', headers=headers)
-            self.assertEqual(204, response.status)
+            self.assertEqual(202, response.status)
 
     def test_997_delete_kernel_from_glance(self):
         path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
