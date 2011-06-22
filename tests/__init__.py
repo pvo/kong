@@ -54,7 +54,8 @@ class FunctionalTest(unittest.TestCase):
                       'openstack-swift-proxy', 'rabbitmq-server']
         self.hosts['roles'] = self.roles
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
-                        self.hosts['geppetto']['port'], self.hosts['geppetto']['path']))
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
         for role in self.roles:
             self.hosts[role] = {}
             if server.role_has_node(role):
@@ -116,4 +117,3 @@ class FunctionalTest(unittest.TestCase):
                 for value in parser.options(section):
                     self.hosts[section][value] = parser.get(section, value)
                     # print "%s = %s" % (value, parser.get(section, value))
-                
