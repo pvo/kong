@@ -70,6 +70,39 @@ class TestGeppetto(tests.FunctionalTest):
         self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
 
+    def test_005_get_config_xapi_pass(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        hv_passwd = server.get_config_parameter_default('XAPI_PASS')
+        self.assertEqual(hv_passwd, "Hybr1d98")
+#        self.assertTrue(server.get_config_parameter_default('XAPI_PASS'))
+
+    def test_006_get_config_guest_network_bridge(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        bridge_dev = server.get_config_parameter_default('GUEST_NETWORK_BRIDGE')
+        self.assertEqual(bridge_dev, "xenbr0")
+#        self.assertTrue(server.get_config_parameter_default('GUEST_NETWORK_BRIDGE'))
+
+    def test_007_get_config_network_manager(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        net_manager = server.get_config_parameter_default('NETWORK_MANAGER')
+        self.assertEqual(net_manager, "nova.network.manager.FlatManager")
+#        self.assertTrue(server.get_config_parameter_default('NETWORK_MANAGER'))
+
+    def test_008_get_config_swift_disk_size_gb(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        swift_disk = server.get_config_parameter_default('SWIFT_DISK_SIZE_GB')
+        pprint(swift_disk)
+        self.assertTrue(swift_disk > 10)
+#        self.assertTrue(server.get_config_parameter_default('SWIFT_DISK_SIZE_GB'))
+
     def test_010_dns_resolution_is_working(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
@@ -83,3 +116,22 @@ class TestGeppetto(tests.FunctionalTest):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
+        min_swift_roles = {
+        	'openstack-swift-account': 3,
+        	'openstack-swift-container': 3,
+        	'openstack-swift-object': 3,
+        	'openstack-swift-rsync': 3,
+        	'openstack-swift-proxy': 1,
+        	'memcached': 1}
+        min_nova_roles = {
+        	'openstack-nova-api': 1,
+        	'openstack-nova-compute': 1,
+        	'openstack-nova-network': 1,
+        	'openstack-nova-scheduler': 1}
+        min_glance_roles = {
+        	'openstack-glance-api': 1,
+        	'openstack-glance-registry': 1}
+        min_dash_roles = {
+        	'openstack-dashboard': 1}
+        min_mysql_roles = {
+        	'mysqld': 1}
