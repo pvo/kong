@@ -82,56 +82,88 @@ class TestGeppetto(tests.FunctionalTest):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        bridge_dev = server.get_config_parameter_default('GUEST_NETWORK_BRIDGE')
+        bridge_dev = server.get_config_parameter_default(
+                     'GUEST_NETWORK_BRIDGE')
         self.assertEqual(bridge_dev, "xenbr0")
-#        self.assertTrue(server.get_config_parameter_default('GUEST_NETWORK_BRIDGE'))
+#        self.assertTrue(server.get_config_parameter_default(
+#                        'GUEST_NETWORK_BRIDGE'))
 
     def test_007_get_config_network_manager(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        net_manager = server.get_config_parameter_default('NETWORK_MANAGER')
+        net_manager = server.get_config_parameter_default(
+                      'NETWORK_MANAGER')
         self.assertEqual(net_manager, "nova.network.manager.FlatManager")
-#        self.assertTrue(server.get_config_parameter_default('NETWORK_MANAGER'))
+#        self.assertTrue(server.get_config_parameter_default(
+#                        'NETWORK_MANAGER'))
 
     def test_008_get_config_swift_disk_size_gb(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        swift_disk = server.get_config_parameter_default('SWIFT_DISK_SIZE_GB')
-        pprint(swift_disk)
+        swift_disk = server.get_config_parameter_default(
+                     'SWIFT_DISK_SIZE_GB')
         self.assertTrue(swift_disk > 10)
-#        self.assertTrue(server.get_config_parameter_default('SWIFT_DISK_SIZE_GB'))
+#        self.assertTrue(server.get_config_parameter_default(
+#                        'SWIFT_DISK_SIZE_GB'))
 
-    def test_010_dns_resolution_is_working(self):
-        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
-                        self.hosts['geppetto']['port'],
-                        self.hosts['geppetto']['path']))
-        #for key, val in geppetto_srv.get_nodes():
-        #    query = self.resolver.query(key, raise_on_no_answer=True)
-        #    self.hosts[key] = query[0].address
-        #print self.hosts
-
-    def test_030_minimum_roles_for_deployment(self):
+    def test_030_minimum_swift_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         min_swift_roles = {
-        	'openstack-swift-account': 3,
-        	'openstack-swift-container': 3,
-        	'openstack-swift-object': 3,
-        	'openstack-swift-rsync': 3,
-        	'openstack-swift-proxy': 1,
-        	'memcached': 1}
+            'openstack-swift-account': 3,
+            'openstack-swift-container': 3,
+            'openstack-swift-object': 3,
+            'openstack-swift-rsync': 3,
+            'openstack-swift-proxy': 1,
+            'memcached': 1}
+        for role, min_count in min_swift_roles.items():
+            nodes = server.get_nodes_in_role(role)
+            self.assertTrue(len(nodes) >= min_count)
+
+    def test_031_minimum_nova_deployment(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
         min_nova_roles = {
-        	'openstack-nova-api': 1,
-        	'openstack-nova-compute': 1,
-        	'openstack-nova-network': 1,
-        	'openstack-nova-scheduler': 1}
+            'openstack-nova-api': 1,
+            'openstack-nova-compute': 1,
+            'openstack-nova-network': 1,
+            'openstack-nova-scheduler': 1}
+        for role, min_count in min_nova_roles.items():
+            nodes = server.get_nodes_in_role(role)
+            self.assertTrue(len(nodes) >= min_count)
+
+    def test_032_minimum_glance_deployment(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
         min_glance_roles = {
-        	'openstack-glance-api': 1,
-        	'openstack-glance-registry': 1}
-        min_dash_roles = {
-        	'openstack-dashboard': 1}
-        min_mysql_roles = {
-        	'mysqld': 1}
+            'openstack-glance-api': 1,
+            'openstack-glance-registry': 1}
+        for role, min_count in min_glance_roles.items():
+            nodes = server.get_nodes_in_role(role)
+            self.assertTrue(len(nodes) >= min_count)
+
+    def test_033_minimum_misc_deployment(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        min_misc_roles = {
+            'openstack-dashboard': 1,
+            'mysqld': 1,
+            'rabbitmq-server': 1}
+        for role, min_count in min_misc_roles.items():
+            nodes = server.get_nodes_in_role(role)
+            self.assertTrue(len(nodes) >= min_count)
+
+    def test_050_dns_resolution_is_working(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        #for key, val in server.get_nodes():
+        #    query = self.resolver.query(key, raise_on_no_answer=True)
+        #    self.hosts[key] = query[0].address
+        #print self.hosts
