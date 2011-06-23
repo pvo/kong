@@ -26,36 +26,59 @@ from pprint import pprint
 TEST_DATA = {}
 TEST_NOVA = {}
 OLYMPUS_HOSTS = {}
+MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
 
 
 class FunctionalTest(unittest.TestCase):
 
     def setUp(self):
-        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS
+        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER
         self.glance = TEST_DATA
         self.nova = TEST_NOVA
         self.resolver = resolver.Resolver(filename='etc/resolv.conf',
                                           configure=True)
         self.hosts = OLYMPUS_HOSTS
+        self.multi_server = MULTI_SERVER
+
         self.geppetto_host = os.getenv('GEPPETTO_HOST')
-        self._find_geppetto_api_endpoints()
-        self._parse_defaults_file()
+        self.hosts['geppetto'] = {}
+        self.hosts['geppetto']['host'] = os.getenv('GEPPETTO_HOST')
+        self.hosts['geppetto']['port'] = os.getenv('GEPPETTO_PORT')
+        self.hosts['geppetto']['path'] = os.getenv('GEPPETTO_PATH')
+
+        if os.getenv('OFFLINE_MODE'):
+            self._fake_geppetto()
+        else:
+            self._find_geppetto_api_endpoints()
+            self._parse_defaults_file()
         # pprint(self.hosts)
 
     def _find_geppetto_api_endpoints(self):
-        self.roles = ['openstack-glance-api', 'openstack-nova-api', 'openstack-swift-proxy', 'rabbitmq-server']
+        self.roles = ['openstack-glance-api', 'openstack-nova-api',
+                      'openstack-swift-proxy', 'rabbitmq-server']
         self.hosts['roles'] = self.roles
-        server = Server("http://%s:%d%s" % (self.geppetto_host, 8080, '/openstack/geppetto'))
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
         for role in self.roles:
             self.hosts[role] = {}
             if server.role_has_node(role):
                 self.hosts[role]['host'] = []
                 for entry in server.get_nodes_in_role(role):
-                    query = self.resolver.query(entry[0], raise_on_no_answer=True)
+                    query = self.resolver.query(entry[0],
+                                 raise_on_no_answer=True)
                     self.hosts[role]['host'].append(query[0].address)
             else:
                 print 'Role [%s] has no member nodes' % role
+
+    def _fake_geppetto(self):
+        self.roles = ['openstack-glance-api', 'openstack-nova-api',
+                      'openstack-swift-proxy', 'rabbitmq-server']
+        self.hosts['roles'] = self.roles
+        for role in self.roles:
+            self.hosts[role] = {}
+            self.hosts[role]['host'] = ['127.0.0.1']
 
     def _md5sum_file(self, path):
         md5sum = md5()
@@ -94,8 +117,8 @@ class FunctionalTest(unittest.TestCase):
         parser.read(config_file)
 
         for section in parser.sections():
-            # pprint(section)
-            for value in parser.options(section):
-                if section in self.hosts:
+            if section in self.hosts:
+                # pprint(section)
+                for value in parser.options(section):
                     self.hosts[section][value] = parser.get(section, value)
                     # print "%s = %s" % (value, parser.get(section, value))

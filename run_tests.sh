@@ -7,6 +7,8 @@ function usage {
   echo "  -V, --virtual-env        Always use virtualenv.  Install automatically if not present"
   echo "  -N, --no-virtual-env     Don't use virtualenv.  Run tests in local environment"
   echo "  -f, --force              Force a clean re-build of the virtual environment. Useful when dependencies have been added."
+  echo "  -p, --pep8               Just run pep8"
+  echo "  -o, --offline		   Run tests in local (OFFLINE) mode."
   echo "  -h, --help               Print this usage message"
   echo ""
   echo "Note: with no options specified, the script will try to run the tests in a virtual environment,"
@@ -22,6 +24,7 @@ function process_option {
     -N|--no-virtual-env) let always_venv=0; let never_venv=1;;
     -f|--force) let force=1;;
     -p|--pep8) let just_pep8=1;;
+    -o|--offline) let offline=1;;
     *) noseargs="$noseargs $1"
   esac
 }
@@ -34,6 +37,7 @@ force=0
 noseargs=
 wrapper=""
 just_pep8=0
+offline=0
 
 for arg in "$@"; do
   process_option $arg
@@ -52,6 +56,11 @@ function run_pep8 {
   ${wrapper} pep8 $PEP8_OPTIONS $PEP8_INCLUDE || exit 1
 }
 NOSETESTS="env python run_tests.py $noseargs"
+
+if [ $offline -eq 1 ]
+then
+  export OFFLINE_MODE=true
+fi
 
 if [ $never_venv -eq 0 ]
 then
