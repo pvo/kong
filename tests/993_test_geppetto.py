@@ -20,20 +20,16 @@ Functional test case to check the status of gepetto and
 set information of hosts etc..
 """
 
-import json
-import os
-import tempfile
-import unittest
 import httplib2
-import urllib
-import hashlib
-import time
-import dns
+# import json
+# import os
+# import tempfile
+# import dns
 from xmlrpclib import Server
 from pprint import pprint
 
 import tests
-from tests.config import get_config
+# from tests.config import get_config
 
 # GEPPETTO_HOST = get_config("geppetto/host")
 # GEPPETTO_PORT = get_config("geppetto/port")
@@ -121,7 +117,9 @@ class TestGeppetto(tests.FunctionalTest):
             'memcached': 1}
         for role, min_count in min_swift_roles.items():
             nodes = server.get_nodes_in_role(role)
-            self.assertTrue(len(nodes) >= min_count)
+            self.assertTrue(len(nodes) >= min_count,
+                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                (role, min_count, len(nodes)))
 
     def test_031_minimum_nova_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -134,7 +132,9 @@ class TestGeppetto(tests.FunctionalTest):
             'openstack-nova-scheduler': 1}
         for role, min_count in min_nova_roles.items():
             nodes = server.get_nodes_in_role(role)
-            self.assertTrue(len(nodes) >= min_count)
+            self.assertTrue(len(nodes) >= min_count,
+                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                (role, min_count, len(nodes)))
 
     def test_032_minimum_glance_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -145,7 +145,9 @@ class TestGeppetto(tests.FunctionalTest):
             'openstack-glance-registry': 1}
         for role, min_count in min_glance_roles.items():
             nodes = server.get_nodes_in_role(role)
-            self.assertTrue(len(nodes) >= min_count)
+            self.assertTrue(len(nodes) >= min_count,
+                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                (role, min_count, len(nodes)))
 
     def test_033_minimum_misc_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -157,7 +159,9 @@ class TestGeppetto(tests.FunctionalTest):
             'rabbitmq-server': 1}
         for role, min_count in min_misc_roles.items():
             nodes = server.get_nodes_in_role(role)
-            self.assertTrue(len(nodes) >= min_count)
+            self.assertTrue(len(nodes) >= min_count,
+                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                (role, min_count, len(nodes)))
 
     def test_050_dns_resolution_is_working(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
