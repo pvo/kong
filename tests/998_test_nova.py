@@ -102,7 +102,19 @@ class TestNovaAPI(tests.FunctionalTest):
             if (key == 'x-auth-token'):
                 self.nova['X-Auth-Token'] = val
 
-    def test_003_list_flavors_v1_1(self):
+    def test_100_limit_check(self):
+        path = "http://%s:%s/%s/limits" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+
+        http = httplib2.Http()
+        headers = {'X-Auth-User': '%s' % (self.nova['user']),
+                   'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+        self.assertNotEqual('{"limits": []}', content)
+
+    def test_101_list_flavors_v1_1(self):
         path = "http://%s:%s/%s/flavors" % (self.nova['host'],
                                             self.nova['port'],
                                             self.nova['ver'])
@@ -113,11 +125,11 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"flavors": []}', content)
 
-    def test_004_verify_kernel_active_v1_1(self):
+    def test_102_verify_kernel_active_v1_1(self):
         # for testing purposes change self.glance['kernel_id'] to an active
         # kernel image allow for skipping glance tests
         if not 'kernel_id' in self.glance:
-            self.glance['kernel_id'] = "243"
+            self.glance['kernel_id'] = "61"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -131,11 +143,11 @@ class TestNovaAPI(tests.FunctionalTest):
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
 
-    def test_005_verify_ramdisk_active_v1_1(self):
+    def test_103_verify_ramdisk_active_v1_1(self):
         # for testing purposes change self.glance['ramdisk_id'] to an active
         # ramdisk image, allows you to skip glance tests
         if not 'ramdisk_id' in self.glance:
-            self.glance['ramdisk_id'] = "244"
+            self.glance['ramdisk_id'] = "62"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -149,11 +161,11 @@ class TestNovaAPI(tests.FunctionalTest):
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
 
-    def test_006_verify_image_active_v1_1(self):
+    def test_104_verify_image_active_v1_1(self):
         # for testing purposes change self.glance['image_id'] to an active
         # image id allows for skipping glance tests
         if not 'image_id' in self.glance:
-            self.glance['image_id'] = "245"
+            self.glance['image_id'] = "63"
 
         path = "http://%s:%s/%s/images/%s" % (self.nova['host'],
                                               self.nova['port'],
@@ -167,7 +179,7 @@ class TestNovaAPI(tests.FunctionalTest):
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
 
-    def test_007_create_server(self):
+    def test_200_create_server(self):
         path = "http://%s:%s/%s/servers" % (self.nova['host'],
                                             self.nova['port'],
                                             self.nova['ver'])
@@ -201,7 +213,23 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(build_result['status'], "ACTIVE")
         self.assertEqual(build_result['ping'], True)
 
-    def test_009_create_multiple(self):
+    def test_201_get_server_details(self):
+        path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
+                                               self.nova['port'],
+                                               self.nova['ver'],
+                                               self.nova['single_server_id'])
+
+        http = httplib2.Http()
+        headers = {'X-Auth-User': '%s' % (self.nova['user']),
+                   'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
+
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+
+    # MOVING TO 999 because it can kill the API
+    # Uncomment next line for testing
+    # def create_multi(self):
+    def test_999_create_multiple(self):
         path = "http://%s:%s/%s/servers" % (self.nova['host'],
                                             self.nova['port'],
                                             self.nova['ver'])
@@ -210,7 +238,7 @@ class TestNovaAPI(tests.FunctionalTest):
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token']),
                    'Content-Type': 'application/json'}
 
-        for i in range(1, 100):
+        for i in range(1, 10):
             # Change imageRef to self.glance['image_id']
             json_str = {"server":
                 {
@@ -236,6 +264,5 @@ class TestNovaAPI(tests.FunctionalTest):
             time.sleep(60)
 
         for k, v in self.multi_server.iteritems():
-            print k, v
             build_result = self.build_check(v)
             self.assertEqual(build_result['ping'], True)

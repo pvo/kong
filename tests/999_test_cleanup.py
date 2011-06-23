@@ -48,6 +48,7 @@ class TestCleanUp(tests.FunctionalTest):
         self.assertEqual(202, response.status)
 
     def test_996_delete_multi_server(self):
+        print len(self.multi_server)
         for k, v in self.multi_server.iteritems():
             path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
                                                    self.nova['port'],
