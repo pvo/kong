@@ -118,7 +118,7 @@ class TestGeppetto(tests.FunctionalTest):
         for role, min_count in min_swift_roles.items():
             nodes = server.get_nodes_in_role(role)
             self.assertTrue(len(nodes) >= min_count,
-                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
     def test_031_minimum_nova_deployment(self):
@@ -133,7 +133,7 @@ class TestGeppetto(tests.FunctionalTest):
         for role, min_count in min_nova_roles.items():
             nodes = server.get_nodes_in_role(role)
             self.assertTrue(len(nodes) >= min_count,
-                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
     def test_032_minimum_glance_deployment(self):
@@ -146,7 +146,7 @@ class TestGeppetto(tests.FunctionalTest):
         for role, min_count in min_glance_roles.items():
             nodes = server.get_nodes_in_role(role)
             self.assertTrue(len(nodes) >= min_count,
-                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
     def test_033_minimum_misc_deployment(self):
@@ -160,8 +160,21 @@ class TestGeppetto(tests.FunctionalTest):
         for role, min_count in min_misc_roles.items():
             nodes = server.get_nodes_in_role(role)
             self.assertTrue(len(nodes) >= min_count,
-                "Expected %s nodes: %s, Geppetto shows: %s" % 
+                "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
+
+    def test_034_not_defined_roles(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        not_defined_roles = [
+            'openstack-nova-objectstore',
+            'openstack-nova-volume']
+        for role in not_defined_roles:
+            nodes = server.get_nodes_in_role(role)
+            self.assertEquals(len(nodes), 0,
+                "%s should not be deployed, Geppetto shows: %s" %
+                (role, len(nodes)))
 
     def test_050_dns_resolution_is_working(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
