@@ -104,7 +104,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['path']))
         swift_disk = server.get_config_parameter_default(
                      'SWIFT_DISK_SIZE_GB')
-        self.assertTrue(swift_disk > 10)
+        self.assertTrue(swift_disk > 20)
 #        self.assertTrue(server.get_config_parameter_default(
 #                        'SWIFT_DISK_SIZE_GB'))
 
