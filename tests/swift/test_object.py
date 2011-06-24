@@ -14,7 +14,7 @@ skip2 = True
 skip3 = True
 
 
-class TestObject(unittest.TestCase):
+class TestSwiftObject(unittest.TestCase):
 
     def setUp(self):
         if skip:

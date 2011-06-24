@@ -10,7 +10,7 @@ from utils import check_response, retry
 skip = False
 
 
-class TestAccount(unittest.TestCase):
+class TestSwiftAccount(unittest.TestCase):
 
     def test_metadata(self):
         if skip:
