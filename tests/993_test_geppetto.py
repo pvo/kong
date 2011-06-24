@@ -20,11 +20,7 @@ Functional test case to check the status of gepetto and
 set information of hosts etc..
 """
 
-import httplib2
-# import json
-# import os
-# import tempfile
-import dns
+# import httplib2
 from xmlrpclib import Server
 from pprint import pprint
 
@@ -94,7 +90,17 @@ class TestGeppetto(tests.FunctionalTest):
 #        self.assertTrue(server.get_config_parameter_default(
 #                        'NETWORK_MANAGER'))
 
-    def test_008_get_config_default_swift_disk_size_gb(self):
+    def test_008_get_config_default_glance_store(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        store = server.get_config_parameter_default(
+                     'GLANCE_STORE')
+        self.assertEqual(store, "swift")
+#        self.assertTrue(server.get_config_parameter_default(
+#                        'GLANCE_STORE'))
+
+    def test_009_get_config_default_swift_disk_size_gb(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
