@@ -20,11 +20,7 @@ Functional test case to check the status of gepetto and
 set information of hosts etc..
 """
 
-import httplib2
-# import json
-# import os
-# import tempfile
-# import dns
+# import httplib2
 from xmlrpclib import Server
 from pprint import pprint
 
@@ -66,7 +62,7 @@ class TestGeppetto(tests.FunctionalTest):
         self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
 
-    def test_005_get_config_xapi_pass(self):
+    def test_005_get_config_default_xapi_pass(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -74,7 +70,7 @@ class TestGeppetto(tests.FunctionalTest):
         self.assertEqual(hv_passwd, "Hybr1d98")
 #        self.assertTrue(server.get_config_parameter_default('XAPI_PASS'))
 
-    def test_006_get_config_guest_network_bridge(self):
+    def test_006_get_config_default_guest_network_bridge(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -84,7 +80,7 @@ class TestGeppetto(tests.FunctionalTest):
 #        self.assertTrue(server.get_config_parameter_default(
 #                        'GUEST_NETWORK_BRIDGE'))
 
-    def test_007_get_config_network_manager(self):
+    def test_007_get_config_default_network_manager(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -94,7 +90,17 @@ class TestGeppetto(tests.FunctionalTest):
 #        self.assertTrue(server.get_config_parameter_default(
 #                        'NETWORK_MANAGER'))
 
-    def test_008_get_config_swift_disk_size_gb(self):
+    def test_008_get_config_default_glance_store(self):
+        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
+                        self.hosts['geppetto']['port'],
+                        self.hosts['geppetto']['path']))
+        store = server.get_config_parameter_default(
+                     'GLANCE_STORE')
+        self.assertEqual(store, "swift")
+#        self.assertTrue(server.get_config_parameter_default(
+#                        'GLANCE_STORE'))
+
+    def test_009_get_config_default_swift_disk_size_gb(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -163,7 +169,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
-    def test_034_not_defined_roles(self):
+    def test_034_verify_roles_not_defined(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -176,11 +182,15 @@ class TestGeppetto(tests.FunctionalTest):
                 "%s should not be deployed, Geppetto shows: %s" %
                 (role, len(nodes)))
 
-    def test_050_dns_resolution_is_working(self):
+    def test_050_dns_resolve_all_nodes(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        #for key, val in server.get_nodes():
-        #    query = self.resolver.query(key, raise_on_no_answer=True)
-        #    self.hosts[key] = query[0].address
-        #print self.hosts
+        nodes = server.get_nodes()
+        for node in nodes:
+            try:
+                self.assertTrue(self.resolver.query(node[0],
+                                raise_on_no_answer=True))
+            except:
+                self.assertFalse(True, "DNS is unable to resolve host: %s"
+                                       % node[0])

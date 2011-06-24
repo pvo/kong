@@ -31,11 +31,21 @@ import tests
 from tests.config import get_config
 
 # GLANCE API TESTS Variables
-TEST_HOST = get_config("glance/host")
-TEST_PORT = get_config("glance/port")
+# TEST_HOST = get_config("glance/host")
+# TEST_PORT = get_config("glance/port")
 
 
 class TestCleanUp(tests.FunctionalTest):
+    def test_000_ghetto_fixup_variables(self):
+        """
+        This sets the host and port self variables so they
+        are accessible by all other methods
+        """
+        # self.glance['host'] = get_config("glance/host")
+        # self.glance['port'] = get_config("glance/port")
+        self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
+        self.glance['port'] = self.hosts['openstack-glance-api']['port']
+
     def test_995_delete_server(self):
         path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
                                                self.nova['port'],
@@ -61,22 +71,25 @@ class TestCleanUp(tests.FunctionalTest):
             self.assertEqual(202, response.status)
 
     def test_997_delete_kernel_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+        path = "http://%s:%s/images/%s" % (self.glance['host'],
+                                           self.glance['port'],
                                            self.glance['kernel_id'])
         http = httplib2.Http()
-        # response, content = http.request(path, 'DELETE')
-        # self.assertEqual(200, response.status)
+        response, content = http.request(path, 'DELETE')
+        self.assertEqual(200, response.status)
 
     def test_998_delete_initrd_from_glance(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+        path = "http://%s:%s/images/%s" % (self.glance['host'],
+                                           self.glance['port'],
                                            self.glance['ramdisk_id'])
         http = httplib2.Http()
-        # response, content = http.request(path, 'DELETE')
-        # self.assertEqual(200, response.status)
+        response, content = http.request(path, 'DELETE')
+        self.assertEqual(200, response.status)
 
     def test_999_delete_image_from_glance_api(self):
-        path = "http://%s:%s/images/%s" % (TEST_HOST, TEST_PORT,
+        path = "http://%s:%s/images/%s" % (self.glance['host'],
+                                           self.glance['port'],
                                            self.glance['image_id'])
         http = httplib2.Http()
-        # response, content = http.request(path, 'DELETE')
-        # self.assertEqual(200, response.status)
+        response, content = http.request(path, 'DELETE')
+        self.assertEqual(200, response.status)

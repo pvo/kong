@@ -10,7 +10,7 @@ from constraints import MAX_META_COUNT, MAX_META_NAME_LENGTH, \
 from utils import check_response, retry
 
 
-class TestContainer(unittest.TestCase):
+class TestSwiftContainer(unittest.TestCase):
 
     def setUp(self):
         self.name = uuid4().hex
