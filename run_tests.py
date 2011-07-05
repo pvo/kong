@@ -2,9 +2,11 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import gettext
+import heapq
 import os
 import unittest
 import sys
+import time
 
 from nose import config
 from nose import result
@@ -124,41 +126,75 @@ class _NullColorizer(object):
         self.stream.write(text)
 
 
+def get_elapsed_time_color(elapsed_time):
+    if elapsed_time > 1.0:
+        return 'red'
+    elif elapsed_time > 0.25:
+        return 'yellow'
+    else:
+        return 'green'
+
+
 class OlympusTestResult(result.TextTestResult):
     def __init__(self, *args, **kw):
+        self.show_elapsed = kw.pop('show_elapsed')
         result.TextTestResult.__init__(self, *args, **kw)
+        self.num_slow_tests = 5
+        self.slow_tests = []  # this is a fixed-sized heap
         self._last_case = None
         self.colorizer = None
         # NOTE(vish, tfukushima): reset stdout for the terminal check
         stdout = sys.__stdout__
+        sys.stdout = sys.__stdout__
         for colorizer in [_Win32Colorizer, _AnsiColorizer, _NullColorizer]:
             if colorizer.supported():
                 self.colorizer = colorizer(self.stream)
                 break
         sys.stdout = stdout
 
+        # NOTE(lorinh): Initialize start_time in case a sqlalchemy-migrate
+        # error results in it failing to be initialized later. Otherwise,
+        # _handleElapsedTime will fail, causing the wrong error message to
+        # be outputted.
+        self.start_time = time.time()
+
     def getDescription(self, test):
         return str(test)
+
+    def _handleElapsedTime(self, test):
+        self.elapsed_time = time.time() - self.start_time
+        item = (self.elapsed_time, test)
+        # Record only the n-slowest tests using heap
+        if len(self.slow_tests) >= self.num_slow_tests:
+            heapq.heappushpop(self.slow_tests, item)
+        else:
+            heapq.heappush(self.slow_tests, item)
+
+    def _writeElapsedTime(self, test):
+        color = get_elapsed_time_color(self.elapsed_time)
+        self.colorizer.write("  %.2f" % self.elapsed_time, color)
+
+    def _writeResult(self, test, long_result, color, short_result, success):
+        if self.showAll:
+            self.colorizer.write(long_result, color)
+            if self.show_elapsed and success:
+                self._writeElapsedTime(test)
+            self.stream.writeln()
+        elif self.dots:
+            self.stream.write(short_result)
+            self.stream.flush()
 
     # NOTE(vish, tfukushima): copied from unittest with edit to add color
     def addSuccess(self, test):
         unittest.TestResult.addSuccess(self, test)
-        if self.showAll:
-            self.colorizer.write("OK", 'green')
-            self.stream.writeln()
-        elif self.dots:
-            self.stream.write('.')
-            self.stream.flush()
+        self._handleElapsedTime(test)
+        self._writeResult(test, 'OK', 'green', '.', True)
 
     # NOTE(vish, tfukushima): copied from unittest with edit to add color
     def addFailure(self, test, err):
         unittest.TestResult.addFailure(self, test, err)
-        if self.showAll:
-            self.colorizer.write("FAIL", 'red')
-            self.stream.writeln()
-        elif self.dots:
-            self.stream.write('F')
-            self.stream.flush()
+        self._handleElapsedTime(test)
+        self._writeResult(test, 'FAIL', 'red', 'F', False)
 
     # NOTE(vish, tfukushima): copied from unittest with edit to add color
     def addError(self, test, err):
@@ -166,6 +202,7 @@ class OlympusTestResult(result.TextTestResult):
         If the exception is a registered class, the error will be added
         to the list for that class, not errors.
         """
+        self._handleElapsedTime(test)
         stream = getattr(self, 'stream', None)
         ec, ev, tb = err
         try:
@@ -182,7 +219,7 @@ class OlympusTestResult(result.TextTestResult):
                 if stream is not None:
                     if self.showAll:
                         message = [label]
-                        detail = result._exception_details(err[1])
+                        detail = result._exception_detail(err[1])
                         if detail:
                             message.append(detail)
                         stream.writeln(": ".join(message))
@@ -192,14 +229,11 @@ class OlympusTestResult(result.TextTestResult):
         self.errors.append((test, exc_info))
         test.passed = False
         if stream is not None:
-            if self.showAll:
-                self.colorizer.write("ERROR", 'red')
-                self.stream.writeln()
-            elif self.dots:
-                stream.write('E')
+            self._writeResult(test, 'ERROR', 'red', 'E', False)
 
     def startTest(self, test):
         unittest.TestResult.startTest(self, test)
+        self.start_time = time.time()
         current_case = test.test.__class__.__name__
 
         if self.showAll:
@@ -213,14 +247,47 @@ class OlympusTestResult(result.TextTestResult):
 
 
 class OlympusTestRunner(core.TextTestRunner):
+    def __init__(self, *args, **kwargs):
+        self.show_elapsed = kwargs.pop('show_elapsed')
+        core.TextTestRunner.__init__(self, *args, **kwargs)
+
     def _makeResult(self):
         return OlympusTestResult(self.stream,
                               self.descriptions,
                               self.verbosity,
-                              self.config)
+                              self.config,
+                              show_elapsed=self.show_elapsed)
+
+    def _writeSlowTests(self, result_):
+        # Pare out 'fast' tests
+        slow_tests = [item for item in result_.slow_tests
+                      if get_elapsed_time_color(item[0]) != 'green']
+        if slow_tests:
+            slow_total_time = sum(item[0] for item in slow_tests)
+            self.stream.writeln("Slowest %i tests took %.2f secs:"
+                                % (len(slow_tests), slow_total_time))
+            for elapsed_time, test in sorted(slow_tests, reverse=True):
+                time_str = "%.2f" % elapsed_time
+                self.stream.writeln("    %s %s" % (time_str.ljust(10), test))
+
+    def run(self, test):
+        result_ = core.TextTestRunner.run(self, test)
+        if self.show_elapsed:
+            self._writeSlowTests(result_)
+        return result_
 
 
 if __name__ == '__main__':
+    show_elapsed = True
+    argv = []
+    for x in sys.argv:
+        if x.startswith('test_'):
+            argv.append('nova.tests.%s' % x)
+        elif x.startswith('--hide-elapsed'):
+            show_elapsed = False
+        else:
+            argv.append(x)
+
     if not os.getenv('GEPPETTO_HOST'):
         print 'Missing GEPPETTO environment variable. Please ' \
               'export GEPPETTO_HOST before running this test.'
@@ -236,9 +303,11 @@ if __name__ == '__main__':
 
     c = config.Config(stream=sys.stdout,
                       env=os.environ,
-                      verbosity=3)
+                      verbosity=3,
+                      plugins=core.DefaultPluginManager())
 
     runner = OlympusTestRunner(stream=c.stream,
                             verbosity=c.verbosity,
-                            config=c)
-    sys.exit(not core.run(config=c, testRunner=runner))
+                            config=c,
+                            show_elapsed=show_elapsed)
+    sys.exit(not core.run(config=c, testRunner=runner, argv=argv))
