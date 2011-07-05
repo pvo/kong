@@ -49,3 +49,7 @@ class TestSkipExamples(tests.FunctionalTest):
            "Not Skipping -- Environment variable BLAH exists")
     def test_skip_if_env_blah_exists(self):
         x = 1
+
+    def test_tags_example(self):
+        pass
+    test_tags_example.tags = ['kvm', 'olympus']
