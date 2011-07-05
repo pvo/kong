@@ -18,6 +18,7 @@
 import unittest
 import os
 import ConfigParser
+import nose.plugins.skip
 from hashlib import md5
 from dns import resolver
 from xmlrpclib import Server
@@ -30,8 +31,53 @@ MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
 
 
-class FunctionalTest(unittest.TestCase):
+class skip_test(object):
+    """Decorator that skips a test."""
+    def __init__(self, msg):
+        self.message = msg
 
+    def __call__(self, func):
+        def _skipper(*args, **kw):
+            """Wrapped skipper function."""
+            raise nose.SkipTest(self.message)
+        _skipper.__name__ = func.__name__
+        _skipper.__doc__ = func.__doc__
+        return _skipper
+
+
+class skip_if(object):
+    """Decorator that skips a test."""
+    def __init__(self, condition, msg):
+        self.condition = condition
+        self.message = msg
+
+    def __call__(self, func):
+        def _skipper(*args, **kw):
+            """Wrapped skipper function."""
+            if self.condition:
+                raise nose.SkipTest(self.message)
+        _skipper.__name__ = func.__name__
+        _skipper.__doc__ = func.__doc__
+        return _skipper
+
+
+class skip_unless(object):
+    """Decorator that skips a test."""
+    def __init__(self, condition, msg):
+        self.condition = condition
+        self.message = msg
+
+    def __call__(self, func):
+        def _skipper(*args, **kw):
+            """Wrapped skipper function."""
+            if not self.condition:
+                raise nose.SkipTest(self.message)
+        _skipper.__name__ = func.__name__
+        _skipper.__doc__ = func.__doc__
+        return _skipper
+
+
+class FunctionalTest(unittest.TestCase):
     def setUp(self):
         global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER
         self.glance = TEST_DATA
