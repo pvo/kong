@@ -33,20 +33,20 @@ import tests
 
 
 class TestGeppetto(tests.FunctionalTest):
-    def test_001_get_nodes(self):
+    def test_get_nodes(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.get_nodes())
 
-    def test_002_get_nodes_in_role(self):
+    def test_get_nodes_in_role(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.get_nodes_in_role('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
 
-    def test_003_get_nodes_not_in_role(self):
+    def test_get_nodes_not_in_role(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -55,62 +55,53 @@ class TestGeppetto(tests.FunctionalTest):
         self.assertFalse(node_list, 'Should not return any vpxs, '
             'currently returning: %s' % len(node_list))
 
-    def test_004_role_has_node(self):
+    def test_role_has_node(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
 
-    def test_005_get_config_default_xapi_pass(self):
+    def test_get_config_default_xapi_pass(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         hv_passwd = server.get_config_parameter_default('XAPI_PASS')
         self.assertEqual(hv_passwd, "Hybr1d98")
-#        self.assertTrue(server.get_config_parameter_default('XAPI_PASS'))
 
-    def test_006_get_config_default_guest_network_bridge(self):
+    def test_get_config_default_guest_network_bridge(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         bridge_dev = server.get_config_parameter_default(
                      'GUEST_NETWORK_BRIDGE')
         self.assertEqual(bridge_dev, "xenbr0")
-#        self.assertTrue(server.get_config_parameter_default(
-#                        'GUEST_NETWORK_BRIDGE'))
 
-    def test_007_get_config_default_network_manager(self):
+    def test_get_config_default_network_manager(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         net_manager = server.get_config_parameter_default(
                       'NETWORK_MANAGER')
         self.assertEqual(net_manager, "nova.network.manager.FlatManager")
-#        self.assertTrue(server.get_config_parameter_default(
-#                        'NETWORK_MANAGER'))
 
-    def test_008_get_config_default_glance_store(self):
+    def test_get_config_default_glance_store(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         store = server.get_config_parameter_default(
                      'GLANCE_STORE')
         self.assertEqual(store, "swift")
-#        self.assertTrue(server.get_config_parameter_default(
-#                        'GLANCE_STORE'))
 
-    def test_009_get_config_default_swift_disk_size_gb(self):
+    def test_get_config_default_swift_disk_size_gb(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         swift_disk = server.get_config_parameter_default(
                      'SWIFT_DISK_SIZE_GB')
         self.assertTrue(swift_disk > 20)
-#        self.assertTrue(server.get_config_parameter_default(
-#                        'SWIFT_DISK_SIZE_GB'))
 
-    def test_030_minimum_swift_deployment(self):
+    def test_minimum_swift_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -127,7 +118,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
-    def test_031_minimum_nova_deployment(self):
+    def test_minimum_nova_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -142,7 +133,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
-    def test_032_minimum_glance_deployment(self):
+    def test_minimum_glance_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -155,7 +146,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
-    def test_033_minimum_misc_deployment(self):
+    def test_minimum_misc_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -169,7 +160,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
 
-    def test_034_verify_roles_not_defined(self):
+    def test_verify_roles_not_defined(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
@@ -182,7 +173,7 @@ class TestGeppetto(tests.FunctionalTest):
                 "%s should not be deployed, Geppetto shows: %s" %
                 (role, len(nodes)))
 
-    def test_050_dns_resolve_all_nodes(self):
+    def test_dns_resolve_all_nodes(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
