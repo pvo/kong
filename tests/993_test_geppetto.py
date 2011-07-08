@@ -38,6 +38,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.get_nodes())
+    test_get_nodes.tags = ['olympus', 'geppetto']
 
     def test_get_nodes_in_role(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -45,6 +46,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.get_nodes_in_role('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+    test_get_nodes_in_role.tags = ['olympus', 'geppetto']
 
     def test_get_nodes_not_in_role(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -54,6 +56,7 @@ class TestGeppetto(tests.FunctionalTest):
         node_list = server.get_nodes_not_in_role('os-vpx-nova-manage')
         self.assertFalse(node_list, 'Should not return any vpxs, '
             'currently returning: %s' % len(node_list))
+    test_get_nodes_not_in_role.tags = ['olympus', 'geppetto']
 
     def test_role_has_node(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -61,6 +64,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['path']))
         self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
             'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+    test_role_has_node.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_xapi_pass(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -68,6 +72,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['path']))
         hv_passwd = server.get_config_parameter_default('XAPI_PASS')
         self.assertEqual(hv_passwd, "Hybr1d98")
+    test_get_config_default_xapi_pass.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_guest_network_bridge(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -76,6 +81,7 @@ class TestGeppetto(tests.FunctionalTest):
         bridge_dev = server.get_config_parameter_default(
                      'GUEST_NETWORK_BRIDGE')
         self.assertEqual(bridge_dev, "xenbr0")
+    test_get_config_default_guest_network_bridge.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_network_manager(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -84,6 +90,7 @@ class TestGeppetto(tests.FunctionalTest):
         net_manager = server.get_config_parameter_default(
                       'NETWORK_MANAGER')
         self.assertEqual(net_manager, "nova.network.manager.FlatManager")
+    test_get_config_default_network_manager.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_glance_store(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -92,6 +99,7 @@ class TestGeppetto(tests.FunctionalTest):
         store = server.get_config_parameter_default(
                      'GLANCE_STORE')
         self.assertEqual(store, "swift")
+    test_get_config_default_glance_store.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_swift_disk_size_gb(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -100,6 +108,7 @@ class TestGeppetto(tests.FunctionalTest):
         swift_disk = server.get_config_parameter_default(
                      'SWIFT_DISK_SIZE_GB')
         self.assertTrue(swift_disk > 20)
+    test_get_config_default_swift_disk_size_gb.tags = ['olympus', 'geppetto']
 
     def test_minimum_swift_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -117,6 +126,7 @@ class TestGeppetto(tests.FunctionalTest):
             self.assertTrue(len(nodes) >= min_count,
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
+    test_minimum_swift_deployment.tags = ['olympus', 'geppetto']
 
     def test_minimum_nova_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -132,6 +142,7 @@ class TestGeppetto(tests.FunctionalTest):
             self.assertTrue(len(nodes) >= min_count,
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
+    test_minimum_nova_deployment.tags = ['olympus', 'geppetto']
 
     def test_minimum_glance_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -145,6 +156,7 @@ class TestGeppetto(tests.FunctionalTest):
             self.assertTrue(len(nodes) >= min_count,
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
+    test_minimum_glance_deployment.tags = ['olympus', 'geppetto']
 
     def test_minimum_misc_deployment(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -159,6 +171,7 @@ class TestGeppetto(tests.FunctionalTest):
             self.assertTrue(len(nodes) >= min_count,
                 "Expected %s nodes: %s, Geppetto shows: %s" %
                 (role, min_count, len(nodes)))
+    test_minimum_misc_deployment.tags = ['olympus', 'geppetto']
 
     def test_verify_roles_not_defined(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -172,6 +185,7 @@ class TestGeppetto(tests.FunctionalTest):
             self.assertEquals(len(nodes), 0,
                 "%s should not be deployed, Geppetto shows: %s" %
                 (role, len(nodes)))
+    test_verify_roles_not_defined.tags = ['olympus', 'geppetto']
 
     def test_dns_resolve_all_nodes(self):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
@@ -185,3 +199,4 @@ class TestGeppetto(tests.FunctionalTest):
             except:
                 self.assertFalse(True, "DNS is unable to resolve host: %s"
                                        % node[0])
+    test_dns_resolve_all_nodes.tags = ['olympus', 'geppetto']
