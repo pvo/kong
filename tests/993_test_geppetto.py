@@ -20,16 +20,10 @@ Functional test case to check the status of gepetto and
 set information of hosts etc..
 """
 
-# import httplib2
 from xmlrpclib import Server
 from pprint import pprint
 
 import tests
-# from tests.config import get_config
-
-# GEPPETTO_HOST = get_config("geppetto/host")
-# GEPPETTO_PORT = get_config("geppetto/port")
-# GEPPETTO_PATH = get_config("geppetto/path")
 
 
 class TestGeppetto(tests.FunctionalTest):
