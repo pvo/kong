@@ -45,6 +45,7 @@ class TestCleanUp(tests.FunctionalTest):
         # self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
+    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance']
 
     def test_995_delete_server(self):
         path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
@@ -77,6 +78,7 @@ class TestCleanUp(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
+    test_997_delete_kernel_from_glance.tags = ['olympus', 'glance']
 
     def test_998_delete_initrd_from_glance(self):
         path = "http://%s:%s/images/%s" % (self.glance['host'],
@@ -85,11 +87,13 @@ class TestCleanUp(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
+    test_998_delete_initrd_from_glance.tags = ['olympus', 'glance']
 
-    def test_999_delete_image_from_glance_api(self):
+    def test_999_delete_image_from_glance(self):
         path = "http://%s:%s/images/%s" % (self.glance['host'],
                                            self.glance['port'],
                                            self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
+    test_999_delete_image_from_glance.tags = ['olympus', 'glance']

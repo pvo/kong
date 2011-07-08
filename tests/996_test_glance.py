@@ -24,7 +24,6 @@ from pprint import pprint
 from tests.config import get_config
 
 import tests
-# from tests.utils import execute
 
 
 class TestGlanceAPI(tests.FunctionalTest):
@@ -37,6 +36,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         # self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
+    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance']
 
     def test_001_connect_to_glance_api(self):
         path = "http://%s:%s/images" % (self.glance['host'],
@@ -45,11 +45,10 @@ class TestGlanceAPI(tests.FunctionalTest):
         response, content = http.request(path, 'GET')
         self.assertEqual(200, response.status)
         self.assertEqual('{"images": []}', content)
+    test_001_connect_to_glance_api.tags = ['olympus', 'glance']
 
     def test_002_upload_kernel_to_glance(self):
         kernel = "sample_vm/vmlinuz-2.6.32-23-server"
-        # md5sum = self._md5sum_file(kernel)
-        # content_length = os.path.getsize(kernel)
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
@@ -64,12 +63,12 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
-        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
         data = json.loads(content)
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(kernel))
+    test_002_upload_kernel_to_glance.tags = ['olympus', 'glance']
 
     def test_003_upload_initrd_to_glance(self):
         initrd = "sample_vm/initrd.img-2.6.32-23-server"
@@ -88,14 +87,14 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
-        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
         data = json.loads(content)
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(initrd))
+    test_003_upload_initrd_to_glance.tags = ['olympus', 'glance']
 
-    def test_004_upload_image(self):
+    def test_004_upload_image_to_glance(self):
         image = "sample_vm/ubuntu-lucid.img"
         upload_data = ""
         for chunk in self._read_in_chunks(image):
@@ -117,8 +116,8 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=upload_data)
         self.assertEqual(201, response.status)
-        #pprint(content)
         data = json.loads(content)
         self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
+    test_004_upload_image_to_glance.tags = ['olympus', 'glance']
