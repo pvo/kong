@@ -14,12 +14,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+"""Validate a working Glance deployment"""
 
-"""Functional test case that utilizes cURL against the API server"""
-
+import httplib2
 import json
 import os
-import httplib2
 from pprint import pprint
 from tests.config import get_config
 
@@ -32,13 +31,17 @@ class TestGlanceAPI(tests.FunctionalTest):
         This sets the host and port self variables so they
         are accessible by all other methods
         """
-        # self.glance['host'] = get_config("glance/host")
-        # self.glance['port'] = get_config("glance/port")
-        self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
-        self.glance['port'] = self.hosts['openstack-glance-api']['port']
+#        self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
+#        self.glance['port'] = self.hosts['openstack-glance-api']['port']
+        self.glance['host'] = get_config("glance/host")
+        self.glance['port'] = get_config("glance/port")
     test_000_ghetto_fixup_variables.tags = ['olympus', 'glance']
 
     def test_001_connect_to_glance_api(self):
+        """
+        Verifies ability to connect to glance api, 
+        expects glance to return an empty set
+        """
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         http = httplib2.Http()
@@ -48,6 +51,9 @@ class TestGlanceAPI(tests.FunctionalTest):
     test_001_connect_to_glance_api.tags = ['olympus', 'glance']
 
     def test_002_upload_kernel_to_glance(self):
+        """
+        Uploads a test kernal to glance api
+        """
         kernel = "sample_vm/vmlinuz-2.6.32-23-server"
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
@@ -71,6 +77,9 @@ class TestGlanceAPI(tests.FunctionalTest):
     test_002_upload_kernel_to_glance.tags = ['olympus', 'glance']
 
     def test_003_upload_initrd_to_glance(self):
+        """
+        Uploads a test initrd to glance api
+        """
         initrd = "sample_vm/initrd.img-2.6.32-23-server"
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
@@ -95,6 +104,11 @@ class TestGlanceAPI(tests.FunctionalTest):
     test_003_upload_initrd_to_glance.tags = ['olympus', 'glance']
 
     def test_004_upload_image_to_glance(self):
+        """
+        Uploads a test image to glance api, and
+        links it to the initrd and kernel uploaded
+        earlier
+        """
         image = "sample_vm/ubuntu-lucid.img"
         upload_data = ""
         for chunk in self._read_in_chunks(image):
