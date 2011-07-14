@@ -270,7 +270,7 @@ class TestNovaAPI(tests.FunctionalTest):
             self.assertEqual(200, response.status)
             self.assertEqual(json_return['server']['status'], "BUILD")
             self.multi_server["test %s" % (i)] = json_return['server']['id']
-            time.sleep(60)
+            time.sleep(30)
 
         for k, v in self.multi_server.iteritems():
             build_result = self.build_check(v)
