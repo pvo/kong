@@ -35,7 +35,7 @@ class TestGlanceAPI(tests.FunctionalTest):
 #        self.glance['port'] = self.hosts['openstack-glance-api']['port']
         self.glance['host'] = get_config("glance/host")
         self.glance['port'] = get_config("glance/port")
-    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance']
+    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance', 'nova']
 
     def test_001_connect_to_glance_api(self):
         """
@@ -74,7 +74,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(kernel))
-    test_002_upload_kernel_to_glance.tags = ['olympus', 'glance']
+    test_002_upload_kernel_to_glance.tags = ['olympus', 'glance', 'nova']
 
     def test_003_upload_initrd_to_glance(self):
         """
@@ -101,7 +101,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(initrd))
-    test_003_upload_initrd_to_glance.tags = ['olympus', 'glance']
+    test_003_upload_initrd_to_glance.tags = ['olympus', 'glance', 'nova']
 
     def test_004_upload_image_to_glance(self):
         """
@@ -134,4 +134,4 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
-    test_004_upload_image_to_glance.tags = ['olympus', 'glance']
+    test_004_upload_image_to_glance.tags = ['olympus', 'glance', 'nova']
