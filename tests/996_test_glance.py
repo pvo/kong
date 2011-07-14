@@ -39,7 +39,7 @@ class TestGlanceAPI(tests.FunctionalTest):
 
     def test_001_connect_to_glance_api(self):
         """
-        Verifies ability to connect to glance api, 
+        Verifies ability to connect to glance api,
         expects glance to return an empty set
         """
         path = "http://%s:%s/images" % (self.glance['host'],
