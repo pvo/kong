@@ -25,6 +25,9 @@ from pprint import pprint
 
 import tests
 
+# Define GLOBAL variables
+TEST_ROLE = 'os-vpx-set-geppetto-properties'
+
 
 class TestGeppetto(tests.FunctionalTest):
     def test_get_nodes(self):
@@ -38,8 +41,8 @@ class TestGeppetto(tests.FunctionalTest):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        self.assertTrue(server.get_nodes_in_role('os-vpx-nova-manage'),
-            'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+        self.assertTrue(server.get_nodes_in_role(TEST_ROLE),
+            'No vpxs defined with role: "%s"' % TEST_ROLE)
     test_get_nodes_in_role.tags = ['olympus', 'geppetto']
 
     def test_get_nodes_not_in_role(self):
@@ -47,7 +50,7 @@ class TestGeppetto(tests.FunctionalTest):
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
         # self.assertTrue(server.get_nodes_not_in_role('mysql'))
-        node_list = server.get_nodes_not_in_role('os-vpx-nova-manage')
+        node_list = server.get_nodes_not_in_role(TEST_ROLE)
         self.assertFalse(node_list, 'Should not return any vpxs, '
             'currently returning: %s' % len(node_list))
     test_get_nodes_not_in_role.tags = ['olympus', 'geppetto']
@@ -56,8 +59,8 @@ class TestGeppetto(tests.FunctionalTest):
         server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
                         self.hosts['geppetto']['port'],
                         self.hosts['geppetto']['path']))
-        self.assertTrue(server.role_has_node('os-vpx-nova-manage'),
-            'No vpxs defined with role: "%s"' % "os-vpx-nova-manage")
+        self.assertTrue(server.role_has_node(TEST_ROLE),
+            'No vpxs defined with role: "%s"' % TEST_ROLE)
     test_role_has_node.tags = ['olympus', 'geppetto']
 
     def test_get_config_default_xapi_pass(self):
