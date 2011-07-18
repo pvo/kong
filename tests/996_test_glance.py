@@ -142,7 +142,11 @@ class TestGlanceAPI(tests.FunctionalTest):
                                            self.glance['port'],
                                            self.glance['image_id'])
         headers = {'X-Image-Meta-Property-Distro': 'Ubuntu',
-                   'X-Image-Meta-Property-Arch': 'x86_64'}
+                   'X-Image-Meta-Property-Arch': 'x86_64',
+                   'X-Image-Meta-Property-Kernel_id': '%s' % \
+                       self.glance['kernel_id'],
+                   'X-Image-Meta-Property-Ramdisk_id': '%s' % \
+                       self.glance['ramdisk_id']}
         http = httplib2.Http()
         response, content = http.request(path, 'PUT', headers=headers)
         pprint(response)
@@ -154,23 +158,22 @@ class TestGlanceAPI(tests.FunctionalTest):
     test_005_set_image_meta_property.tags = ['olympus', 'glance']
 
     def test_006_list_image_metadata(self):
+        image = "sample_vm/ubuntu-lucid.img"
         path = "http://%s:%s/images/%s" % (self.glance['host'],
                                            self.glance['port'],
                                            self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'HEAD')
-        pprint(response)
-        pprint(content)
         self.assertEqual(response.status, 200)
-        data = json.loads(content)
-        self.assertEqual(data['image']['name'], "test-image")
-        self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
-        self.assertEqual(data['image']['container-format'], "ami")
-        self.assertEqual(data['image']['disk-format'], "ami")
-        self.assertEqual(data['image']['properties']['arch'], "x86_64")
-        self.assertEqual(data['image']['properties']['distro'], "Ubuntu")
-        self.assertEqual(data['image']['properties']['Kernel_id'],
-                         self.glance['kernel_id'])
-        self.assertEqual(data['image']['properties']['Ramdisk_id'],
-                         self.glance['ramdisk_id'])
+        self.assertEqual(response['x-image-meta-name'], "test-image")
+        self.assertEqual(response['x-image-meta-checksum'],
+                         self._md5sum_file(image))
+        self.assertEqual(response['x-image-meta-container_format'], "ami")
+        self.assertEqual(response['x-image-meta-disk_format'], "ami")
+        self.assertEqual(response['x-image-meta-property-arch'], "x86_64")
+        self.assertEqual(response['x-image-meta-property-distro'], "Ubuntu")
+        self.assertEqual(response['x-image-meta-property-kernel_id'],
+                         str(self.glance['kernel_id']))
+        self.assertEqual(response['x-image-meta-property-ramdisk_id'],
+                         str(self.glance['ramdisk_id']))
     test_006_list_image_metadata.tags = ['olympus', 'glance']
