@@ -22,6 +22,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp = retry(put)
         resp.read()
         self.assertEquals(resp.status, 201)
+    setUp.tags = ['swift', 'olympus']
 
     def tearDown(self):
         def get(url, token, parsed, conn):
@@ -53,6 +54,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp = retry(delete)
         resp.read()
         self.assertEquals(resp.status, 204)
+    tearDown.tags = ['swift', 'olympus']
 
     def test_multi_metadata(self):
         def post(url, token, parsed, conn, name, value):
@@ -79,6 +81,7 @@ class TestSwiftContainer(unittest.TestCase):
         self.assert_(resp.status in (200, 204), resp.status)
         self.assertEquals(resp.getheader('x-container-meta-one'), '1')
         self.assertEquals(resp.getheader('x-container-meta-two'), '2')
+    test_multi_metadata.tags = ['swift', 'olympus']
 
     def test_PUT_metadata(self):
         def put(url, token, parsed, conn, name, value):
@@ -131,6 +134,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp = retry(delete, name)
         resp.read()
         self.assertEquals(resp.status, 204)
+    test_PUT_metadata.tags = ['swift', 'olympus']
 
     def test_POST_metadata(self):
         def post(url, token, parsed, conn, value):
@@ -166,6 +170,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp.read()
         self.assert_(resp.status in (200, 204), resp.status)
         self.assertEquals(resp.getheader('x-container-meta-test'), 'Value')
+    test_POST_metadata.tags = ['swift', 'olympus']
 
     def test_PUT_bad_metadata(self):
         def put(url, token, parsed, conn, name, extra_headers):
@@ -260,6 +265,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp = retry(delete, name)
         resp.read()
         self.assertEquals(resp.status, 404)
+    test_PUT_bad_metadata.tags = ['swift', 'olympus']
 
     def test_POST_bad_metadata(self):
         def post(url, token, parsed, conn, extra_headers):
@@ -317,6 +323,7 @@ class TestSwiftContainer(unittest.TestCase):
         resp = retry(post, headers)
         resp.read()
         self.assertEquals(resp.status, 400)
+    test_POST_bad_metadata.tags = ['swift', 'olympus']
 
     def test_public_container(self):
         def get(url, token, parsed, conn):
@@ -352,6 +359,7 @@ class TestSwiftContainer(unittest.TestCase):
             raise Exception('Should not have been able to GET')
         except Exception, err:
             self.assert_(str(err).startswith('No result after '), err)
+    test_public_container.tags = ['swift', 'olympus']
 
 
 if __name__ == '__main__':
