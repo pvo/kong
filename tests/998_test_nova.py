@@ -113,6 +113,7 @@ class TestNovaAPI(tests.FunctionalTest):
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"limits": []}', content)
+	pprint(content)
 
     def test_101_list_flavors_v1_1(self):
         path = "http://%s:%s/%s/flavors" % (self.nova['host'],
