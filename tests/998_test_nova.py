@@ -206,8 +206,8 @@ class TestNovaAPI(tests.FunctionalTest):
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"limits": []}', content)
-	pprint(content)
-        test_109_verify_blank_limits.tags = ['olympus', 'nova', 'nova-api']
+        pprint(content)
+    test_109_verify_blank_limits.tags = ['olympus', 'nova', 'nova-api']
 
     def test_110_list_flavors_v1_1(self):
         path = "http://%s:%s/%s/flavors" % (self.nova['host'],
