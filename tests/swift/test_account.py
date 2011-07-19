@@ -50,6 +50,7 @@ class TestSwiftAccount(unittest.TestCase):
         resp.read()
         self.assert_(resp.status in (200, 204), resp.status)
         self.assertEquals(resp.getheader('x-account-meta-test'), 'Value')
+    test_metadata.tags = ['swift', 'olympus']
 
     def test_multi_metadata(self):
         if skip:
@@ -78,6 +79,7 @@ class TestSwiftAccount(unittest.TestCase):
         self.assert_(resp.status in (200, 204), resp.status)
         self.assertEquals(resp.getheader('x-account-meta-one'), '1')
         self.assertEquals(resp.getheader('x-account-meta-two'), '2')
+    test_multi_metadata.tags = ['swift', 'olympus']
 
     def test_bad_metadata(self):
         if skip:
@@ -138,6 +140,7 @@ class TestSwiftAccount(unittest.TestCase):
         resp = retry(post, headers)
         resp.read()
         self.assertEquals(resp.status, 400)
+    test_bad_metadata.tags = ['swift', 'olympus']
 
 
 if __name__ == '__main__':

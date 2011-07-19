@@ -149,12 +149,14 @@ class TestGlanceAPI(tests.FunctionalTest):
                        self.glance['ramdisk_id']}
         http = httplib2.Http()
         response, content = http.request(path, 'PUT', headers=headers)
-        pprint(response)
-        pprint(content)
         self.assertEqual(response.status, 200)
         data = json.loads(content)
         self.assertEqual(data['image']['properties']['arch'], "x86_64")
         self.assertEqual(data['image']['properties']['distro'], "Ubuntu")
+        self.assertEqual(data['image']['properties']['kernel_id'],
+                         str(self.glance['kernel_id']))
+        self.assertEqual(data['image']['properties']['ramdisk_id'],
+                         str(self.glance['ramdisk_id']))
     test_005_set_image_meta_property.tags = ['olympus', 'glance']
 
     def test_006_list_image_metadata(self):
