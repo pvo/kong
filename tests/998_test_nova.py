@@ -86,6 +86,7 @@ class TestNovaAPI(tests.FunctionalTest):
         self.nova['ver'] = self.hosts['openstack-nova-api']['apiver']
         self.nova['user'] = self.hosts['openstack-nova-api']['user']
         self.nova['key'] = self.hosts['openstack-nova-api']['key']
+    test_001_setup.tags = ['olympus', 'nova', 'nova-api']
 
     def test_002_verify_nova_auth(self):
         path = "http://%s:%s/%s" % (self.nova['host'],
@@ -96,13 +97,105 @@ class TestNovaAPI(tests.FunctionalTest):
                    'X-Auth-Key': '%s' % (self.nova['key'])}
         response, content = http.request(path, 'HEAD', headers=headers)
         self.assertEqual(204, response.status)
+        self.assertEqual(len(response['x-auth-token']), 40)
+        self.assertEqual(response['x-cdn-management-url'], "")
+        self.assertEqual(response['x-storage-url'], "")
 
         # Set up Auth Token for all future API interactions
         for key, val in response.items():
             if (key == 'x-auth-token'):
                 self.nova['X-Auth-Token'] = val
+    test_002_verify_nova_auth.tags = ['olympus', 'nova', 'nova-api']
 
-    def test_100_limit_check(self):
+    def test_101_verify_version_selection_default(self):
+        path = "http://%s:%s/" % (self.nova['host'],
+                                           self.nova['port'])
+        http = httplib2.Http()
+        headers = {'X-Auth-Token': self.nova['X-Auth-Token']}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+        data = json.loads(content)
+        self.assertEqual(len(data['versions']), 2)
+    test_101_verify_version_selection_default.tags = ['olympus', 'nova',
+                                                      'nova-api']
+
+    def test_102_verify_version_selection_json(self):
+        path = "http://%s:%s/.json" % (self.nova['host'],
+                                           self.nova['port'])
+        http = httplib2.Http()
+        headers = {'X-Auth-Token': self.nova['X-Auth-Token']}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+        data = json.loads(content)
+        self.assertEqual(len(data['versions']), 2)
+    test_102_verify_version_selection_json.tags = ['olympus', 'nova',
+                                                   'nova-api']
+
+    def test_103_verify_version_selection_xml(self):
+        path = "http://%s:%s/.xml" % (self.nova['host'],
+                                           self.nova['port'])
+        http = httplib2.Http()
+        headers = {'X-Auth-Token': self.nova['X-Auth-Token']}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(200, response.status)
+        self.assertTrue('<versions>' in content)
+    test_103_verify_version_selection_xml.tags = ['olympus', 'nova',
+                                                  'nova-api']
+
+    def test_104_bad_user_bad_key(self):
+        path = "http://%s:%s/%s/" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': 'unknown_auth_user',
+                  'X-Auth-Key': 'unknown_auth_key'}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(response.status, 401)
+    test_104_bad_user_bad_key.tags = ['olympus', 'nova', 'nova-api']
+
+    def test_105_bad_user_good_key(self):
+        path = "http://%s:%s/%s/" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': 'unknown_auth_user',
+                  'X-Auth-Key': self.nova['key']}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(response.status, 401)
+    test_105_bad_user_good_key.tags = ['olympus', 'nova', 'nova-api']
+
+    def test_106_good_user_bad_key(self):
+        path = "http://%s:%s/%s/" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': self.nova['user'],
+                  'X-Auth-Key': 'unknown_auth_key'}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(response.status, 401)
+    test_106_good_user_bad_key.tags = ['olympus', 'nova', 'nova-api']
+
+    def test_107_no_key(self):
+        path = "http://%s:%s/%s/" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-User': self.nova['user']}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(response.status, 401)
+    test_107_no_key.tags = ['olympus', 'nova', 'nova-api']
+
+    def test_108_bad_token(self):
+        path = "http://%s:%s/%s/" % (self.nova['host'],
+                                           self.nova['port'],
+                                           self.nova['ver'])
+        http = httplib2.Http()
+        headers = {'X-Auth-Token': 'unknown_token'}
+        response, content = http.request(path, 'GET', headers=headers)
+        self.assertEqual(response.status, 401)
+    test_108_bad_token.tags = ['olympus', 'nova', 'nova-api']
+
+    def test_109_verify_blank_limits(self):
         path = "http://%s:%s/%s/limits" % (self.nova['host'],
                                            self.nova['port'],
                                            self.nova['ver'])
@@ -114,8 +207,9 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"limits": []}', content)
 	pprint(content)
+        test_109_verify_blank_limits.tags = ['olympus', 'nova', 'nova-api']
 
-    def test_101_list_flavors_v1_1(self):
+    def test_110_list_flavors_v1_1(self):
         path = "http://%s:%s/%s/flavors" % (self.nova['host'],
                                             self.nova['port'],
                                             self.nova['ver'])
@@ -125,8 +219,9 @@ class TestNovaAPI(tests.FunctionalTest):
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"flavors": []}', content)
+    test_110_list_flavors_v1_1.tags = ['olympus', 'nova', 'nova-api']
 
-    def test_102_verify_kernel_active_v1_1(self):
+    def test_111_verify_kernel_active_v1_1(self):
         # for testing purposes change self.glance['kernel_id'] to an active
         # kernel image allow for skipping glance tests
         if not 'kernel_id' in self.glance:
@@ -143,8 +238,9 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
+    test_111_verify_kernel_active_v1_1.tags = ['olympus', 'nova']
 
-    def test_103_verify_ramdisk_active_v1_1(self):
+    def test_112_verify_ramdisk_active_v1_1(self):
         # for testing purposes change self.glance['ramdisk_id'] to an active
         # ramdisk image, allows you to skip glance tests
         if not 'ramdisk_id' in self.glance:
@@ -161,8 +257,9 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
+    test_112_verify_ramdisk_active_v1_1.tags = ['olympus', 'nova']
 
-    def test_104_verify_image_active_v1_1(self):
+    def test_113_verify_image_active_v1_1(self):
         # for testing purposes change self.glance['image_id'] to an active
         # image id allows for skipping glance tests
         if not 'image_id' in self.glance:
@@ -179,6 +276,7 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         data = json.loads(content)
         self.assertEqual(data['image']['status'], 'ACTIVE')
+    test_113_verify_image_active_v1_1.tags = ['olympus', 'nova']
 
     def test_200_create_server(self):
         path = "http://%s:%s/%s/servers" % (self.nova['host'],
@@ -213,6 +311,7 @@ class TestNovaAPI(tests.FunctionalTest):
         build_result = self.build_check(self.nova['single_server_id'])
         self.assertEqual(build_result['status'], "ACTIVE")
         self.assertEqual(build_result['ping'], True)
+    test_200_create_server.tags = ['olympus', 'nova']
 
     def test_201_get_server_details(self):
         path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
@@ -226,6 +325,7 @@ class TestNovaAPI(tests.FunctionalTest):
 
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
+    test_201_get_server_details.tags = ['olympus', 'nova']
 
     # MOVING TO 999 because it can kill the API
     # Uncomment next line for testing
@@ -262,8 +362,9 @@ class TestNovaAPI(tests.FunctionalTest):
             self.assertEqual(200, response.status)
             self.assertEqual(json_return['server']['status'], "BUILD")
             self.multi_server["test %s" % (i)] = json_return['server']['id']
-            time.sleep(60)
+            time.sleep(30)
 
         for k, v in self.multi_server.iteritems():
             build_result = self.build_check(v)
             self.assertEqual(build_result['ping'], True)
+    test_999_create_multiple.tags = ['olympus', 'nova']

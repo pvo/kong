@@ -9,6 +9,9 @@ function usage {
   echo "  -f, --force              Force a clean re-build of the virtual environment. Useful when dependencies have been added."
   echo "  -p, --pep8               Just run pep8"
   echo "  -o, --offline		   Run tests in local (OFFLINE) mode."
+  echo "  --olympus		   Run all tests tagged as \"Olympus\"."
+  echo "  --geppetto		   Run all tests tagged as \"Geppetto\"."
+  echo "  --glance		   Run all tests tagged as \"Glance\"."
   echo "  -h, --help               Print this usage message"
   echo ""
   echo "Note: with no options specified, the script will try to run the tests in a virtual environment,"
@@ -25,6 +28,9 @@ function process_option {
     -f|--force) let force=1;;
     -p|--pep8) let just_pep8=1;;
     -o|--offline) let offline=1;;
+    --olympus) noseargs="$noseargs -a tags=olympus";;
+    --glance) noseargs="$noseargs -a tags=glance";;
+    --geppetto) noseargs="$noseargs -a tags=geppetto";;
     *) noseargs="$noseargs $1"
   esac
 }

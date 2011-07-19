@@ -14,17 +14,15 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+"""Validate a working Glance deployment"""
 
-"""Functional test case that utilizes cURL against the API server"""
-
+import httplib2
 import json
 import os
-import httplib2
 from pprint import pprint
 from tests.config import get_config
 
 import tests
-# from tests.utils import execute
 
 
 class TestGlanceAPI(tests.FunctionalTest):
@@ -33,23 +31,31 @@ class TestGlanceAPI(tests.FunctionalTest):
         This sets the host and port self variables so they
         are accessible by all other methods
         """
-        # self.glance['host'] = get_config("glance/host")
-        # self.glance['port'] = get_config("glance/port")
+#         self.glance['host'] = get_config("glance/host")
+#         self.glance['port'] = get_config("glance/port")
         self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
         self.glance['port'] = self.hosts['openstack-glance-api']['port']
+    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance', 'nova']
 
     def test_001_connect_to_glance_api(self):
+        """
+        Verifies ability to connect to glance api,
+        expects glance to return an empty set
+        """
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         http = httplib2.Http()
         response, content = http.request(path, 'GET')
         self.assertEqual(200, response.status)
-        self.assertEqual('{"images": []}', content)
+        data = json.loads(content)
+        self.assertTrue('images' in data)
+    test_001_connect_to_glance_api.tags = ['olympus', 'glance']
 
     def test_002_upload_kernel_to_glance(self):
+        """
+        Uploads a test kernal to glance api
+        """
         kernel = "sample_vm/vmlinuz-2.6.32-23-server"
-        # md5sum = self._md5sum_file(kernel)
-        # content_length = os.path.getsize(kernel)
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
@@ -64,14 +70,17 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
-        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
         data = json.loads(content)
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(kernel))
+    test_002_upload_kernel_to_glance.tags = ['olympus', 'glance', 'nova']
 
     def test_003_upload_initrd_to_glance(self):
+        """
+        Uploads a test initrd to glance api
+        """
         initrd = "sample_vm/initrd.img-2.6.32-23-server"
         path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
@@ -88,14 +97,19 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=image_file)
         image_file.close()
-        # print "Content: %s" % pprint(content)
         self.assertEqual(201, response.status)
         data = json.loads(content)
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(initrd))
+    test_003_upload_initrd_to_glance.tags = ['olympus', 'glance', 'nova']
 
-    def test_004_upload_image(self):
+    def test_004_upload_image_to_glance(self):
+        """
+        Uploads a test image to glance api, and
+        links it to the initrd and kernel uploaded
+        earlier
+        """
         image = "sample_vm/ubuntu-lucid.img"
         upload_data = ""
         for chunk in self._read_in_chunks(image):
@@ -117,8 +131,49 @@ class TestGlanceAPI(tests.FunctionalTest):
                                          headers=headers,
                                          body=upload_data)
         self.assertEqual(201, response.status)
-        #pprint(content)
         data = json.loads(content)
         self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
+    test_004_upload_image_to_glance.tags = ['olympus', 'glance', 'nova']
+
+    def test_005_set_image_meta_property(self):
+        path = "http://%s:%s/images/%s" % (self.glance['host'],
+                                           self.glance['port'],
+                                           self.glance['image_id'])
+        headers = {'X-Image-Meta-Property-Distro': 'Ubuntu',
+                   'X-Image-Meta-Property-Arch': 'x86_64',
+                   'X-Image-Meta-Property-Kernel_id': '%s' % \
+                       self.glance['kernel_id'],
+                   'X-Image-Meta-Property-Ramdisk_id': '%s' % \
+                       self.glance['ramdisk_id']}
+        http = httplib2.Http()
+        response, content = http.request(path, 'PUT', headers=headers)
+        pprint(response)
+        pprint(content)
+        self.assertEqual(response.status, 200)
+        data = json.loads(content)
+        self.assertEqual(data['image']['properties']['arch'], "x86_64")
+        self.assertEqual(data['image']['properties']['distro'], "Ubuntu")
+    test_005_set_image_meta_property.tags = ['olympus', 'glance']
+
+    def test_006_list_image_metadata(self):
+        image = "sample_vm/ubuntu-lucid.img"
+        path = "http://%s:%s/images/%s" % (self.glance['host'],
+                                           self.glance['port'],
+                                           self.glance['image_id'])
+        http = httplib2.Http()
+        response, content = http.request(path, 'HEAD')
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response['x-image-meta-name'], "test-image")
+        self.assertEqual(response['x-image-meta-checksum'],
+                         self._md5sum_file(image))
+        self.assertEqual(response['x-image-meta-container_format'], "ami")
+        self.assertEqual(response['x-image-meta-disk_format'], "ami")
+        self.assertEqual(response['x-image-meta-property-arch'], "x86_64")
+        self.assertEqual(response['x-image-meta-property-distro'], "Ubuntu")
+        self.assertEqual(response['x-image-meta-property-kernel_id'],
+                         str(self.glance['kernel_id']))
+        self.assertEqual(response['x-image-meta-property-ramdisk_id'],
+                         str(self.glance['ramdisk_id']))
+    test_006_list_image_metadata.tags = ['olympus', 'glance']
