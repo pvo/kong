@@ -38,6 +38,7 @@ class TestSwiftObject(tests.FunctionalTest):
         resp = retry(put)
         resp.read()
         self.assertEquals(resp.status, 201)
+    setUp.tags = ['swift', 'olympus']
 
     def tearDown(self):
         if skip:
@@ -73,6 +74,7 @@ class TestSwiftObject(tests.FunctionalTest):
         resp = retry(delete)
         resp.read()
         self.assertEquals(resp.status, 204)
+    tearDown.tags = ['swift', 'olympus']
 
     def test_copy_object(self):
         if skip:
@@ -147,6 +149,7 @@ class TestSwiftObject(tests.FunctionalTest):
         resp = retry(delete)
         resp.read()
         self.assertEquals(resp.status, 204)
+    test_copy_object.tags = ['swift', 'olympus']
 
     def test_public_object(self):
         if skip:
@@ -186,6 +189,7 @@ class TestSwiftObject(tests.FunctionalTest):
             raise Exception('Should not have been able to GET')
         except Exception, err:
             self.assert_(str(err).startswith('No result after '))
+    test_public_object.tags = ['swift', 'olympus']
 
     def test_manifest(self):
         if skip:
@@ -449,6 +453,7 @@ class TestSwiftObject(tests.FunctionalTest):
         resp = retry(delete)
         resp.read()
         self.assertEquals(resp.status, 204)
+    test_manifest.tags = ['swift', 'olympus']
 
 
 if __name__ == '__main__':
