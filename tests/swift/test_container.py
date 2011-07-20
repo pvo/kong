@@ -2,15 +2,16 @@
 
 import json
 import unittest
+import tests
 from uuid import uuid4
 
 from constraints import MAX_META_COUNT, MAX_META_NAME_LENGTH, \
     MAX_META_OVERALL_SIZE, MAX_META_VALUE_LENGTH
 
-from utils import check_response, retry
+# from utils import check_response, retry
 
 
-class TestSwiftContainer(unittest.TestCase):
+class TestSwiftContainer(tests.FunctionalTest):
 
     def setUp(self):
         self.name = uuid4().hex

@@ -1,20 +1,21 @@
 #!/usr/bin/python
 
 import unittest
+import tests
 from nose import SkipTest
 from uuid import uuid4
 
 from constraints import MAX_META_COUNT, MAX_META_NAME_LENGTH, \
     MAX_META_OVERALL_SIZE, MAX_META_VALUE_LENGTH
 
-from utils import check_response, retry
+# from utils import check_response, retry
 
 skip = False
 skip2 = True
 skip3 = True
 
 
-class TestSwiftObject(unittest.TestCase):
+class TestSwiftObject(tests.FunctionalTest):
 
     def setUp(self):
         if skip:

@@ -26,6 +26,7 @@ from pprint import pprint
 
 TEST_DATA = {}
 TEST_NOVA = {}
+SWIFT_CONF = {}
 OLYMPUS_HOSTS = {}
 MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
@@ -79,9 +80,10 @@ class skip_unless(object):
 
 class FunctionalTest(unittest.TestCase):
     def setUp(self):
-        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER
+        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER, SWIFT_CONF
         self.glance = TEST_DATA
         self.nova = TEST_NOVA
+        self.conf = SWIFT_CONF
         self.resolver = resolver.Resolver(filename='etc/resolv.conf',
                                           configure=True)
         self.hosts = OLYMPUS_HOSTS
@@ -98,7 +100,26 @@ class FunctionalTest(unittest.TestCase):
         else:
             self._find_geppetto_api_endpoints()
             self._parse_defaults_file()
-        # pprint(self.hosts)
+        pprint(self.hosts)
+
+        # Swift Setup
+        self.conf = {
+            # 'auth_host': get_config('swift/auth_host'),
+            'auth_host': self.hosts['openstack-swift-proxy']['host'][0],
+            'auth_port': self.hosts['openstack-swift-proxy']['auth_port'],
+            'auth_prefix': self.hosts['openstack-swift-proxy']['auth_prefix'],
+            'auth_ssl': self.hosts['openstack-swift-proxy']['auth_ssl'],
+            'account': self.hosts['openstack-swift-proxy']['account'],
+            'username': self.hosts['openstack-swift-proxy']['username'],
+            'password': self.hosts['openstack-swift-proxy']['password'],
+         }
+            # 'auth_port': get_config('swift/auth_port'),
+            # 'auth_prefix': get_config('swift/auth_prefix'),
+            # 'auth_ssl': get_config('swift/auth_ssl'),
+            # 'account': get_config('swift/account'),
+            # 'username': get_config('swift/username'),
+            # 'password': get_config('swift/password'),
+
 
     def _find_geppetto_api_endpoints(self):
         self.roles = ['openstack-glance-api', 'openstack-nova-api',

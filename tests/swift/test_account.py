@@ -1,18 +1,22 @@
 #!/usr/bin/python
 
 import unittest
+import tests
+from pprint import pprint
 from nose import SkipTest
 
 from constraints import MAX_META_COUNT, MAX_META_NAME_LENGTH, \
     MAX_META_OVERALL_SIZE, MAX_META_VALUE_LENGTH
 
-from utils import check_response, retry
+# from utils import check_response, retry
+from tests.swift import check_response, retry
 skip = False
 
 
-class TestSwiftAccount(unittest.TestCase):
+class TestSwiftAccount(tests.FunctionalTest):
 
     def test_metadata(self):
+	pprint(self.hosts)
         if skip:
             raise SkipTest
 
@@ -139,6 +143,3 @@ class TestSwiftAccount(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 400)
 
-
-if __name__ == '__main__':
-    unittest.main()
