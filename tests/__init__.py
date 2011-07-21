@@ -19,12 +19,6 @@ import unittest
 import os
 import ConfigParser
 import nose.plugins.skip
-import os
-import socket
-import sys
-from httplib import HTTPException, HTTPConnection, HTTPSConnection
-from time import sleep
-from urlparse import urlparse, urlunparse
 from hashlib import md5
 from dns import resolver
 from xmlrpclib import Server
@@ -36,13 +30,6 @@ SWIFT_CONF = {}
 OLYMPUS_HOSTS = {}
 MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
-url = [None, None, None]
-token = [None, None, None]
-parsed = [None, None, None]
-conn = [None, None, None]
-
-
-
 
 class skip_test(object):
     """Decorator that skips a test."""
