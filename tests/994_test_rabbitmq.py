@@ -19,19 +19,29 @@
 import pika
 import tests
 
-from tests.config import get_config
-RABBITMQ_HOST = get_config("rabbitmq/host")
-RABBITMQ_USERNAME = get_config("rabbitmq/user")
-RABBITMQ_PASSWORD = get_config("rabbitmq/password")
+from pprint import pprint
+#RABBITMQ_HOST = get_config("rabbitmq/host")
+#RABBITMQ_USERNAME = get_config("rabbitmq/user")
+#RABBITMQ_PASSWORD = get_config("rabbitmq/password")
 
 
 class TestRabbitMQ(tests.FunctionalTest):
+    def test_000_ghetto(self):
+        """
+        This sets the host, user, and pass self variables so they
+        are accessible by all other methods
+        """
+        self.rabbitmq['host'] = self.config['rabbitmq']['host']
+        self.rabbitmq['user'] = self.config['rabbitmq']['user']
+        self.rabbitmq['pass'] = self.config['rabbitmq']['password']
+    test_000_ghetto.tags = ['rabbitmq']
+
     def _cnx(self):
         # TODO: Figuring out what's going with creds
         # creds = pika.credentials.PlainCredentials(
-        #     RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
+        #     self.rabbitmq['user'], self.rabbitmq['pass']
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-                host=RABBITMQ_HOST))
+                host=self.rabbitmq['host']))
         channel = connection.channel()
         return (channel, connection)
 
@@ -39,6 +49,7 @@ class TestRabbitMQ(tests.FunctionalTest):
         channel, connection = self._cnx()
         self.assert_(channel)
         connection.close()
+    test_001_connect.tags = ['rabbitmq']
 
     def test_002_send_receive_msg(self):
         unitmsg = 'Hello from unittest'
@@ -59,6 +70,7 @@ class TestRabbitMQ(tests.FunctionalTest):
                               queue='u1',
                               no_ack=True)
         channel.start_consuming()
+    test_002_send_receive_msg.tags = ['rabbitmq']
 
     def test_003_send_receive_msg_with_persistense(self):
         unitmsg = 'Hello from unittest with Persistense'
@@ -85,3 +97,4 @@ class TestRabbitMQ(tests.FunctionalTest):
                               queue='u2')
 
         channel.start_consuming()
+    test_003_send_receive_msg_with_persistense.tags = ['rabbitmq']
