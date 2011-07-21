@@ -339,7 +339,7 @@ class TestNovaAPI(tests.FunctionalTest):
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token']),
                    'Content-Type': 'application/json'}
 
-        for i in range(1, 10):
+        for i in range(1, 100):
             # Change imageRef to self.glance['image_id']
             json_str = {"server":
                 {
@@ -362,6 +362,7 @@ class TestNovaAPI(tests.FunctionalTest):
             self.assertEqual(200, response.status)
             self.assertEqual(json_return['server']['status'], "BUILD")
             self.multi_server["test %s" % (i)] = json_return['server']['id']
+            self.nova_multi_count = i
             time.sleep(30)
 
         for k, v in self.multi_server.iteritems():

@@ -110,6 +110,7 @@ class FunctionalTest(unittest.TestCase):
             'account': self.hosts['openstack-swift-proxy']['account'],
             'username': self.hosts['openstack-swift-proxy']['username'],
             'password': self.hosts['openstack-swift-proxy']['password'],
+            'ver': 'v1.0' # need a better way to find this
         }
 
     def _find_geppetto_api_endpoints(self):
