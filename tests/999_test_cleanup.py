@@ -90,6 +90,7 @@ class TestCleanUp(tests.FunctionalTest):
     test_998_delete_initrd_from_glance.tags = ['olympus', 'glance', 'nova']
 
     def test_999_delete_image_from_glance(self):
+        print "Deleting %s instances." % (self.nova_multi_count)
         path = "http://%s:%s/images/%s" % (self.glance['host'],
                                            self.glance['port'],
                                            self.glance['image_id'])
