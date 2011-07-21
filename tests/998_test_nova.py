@@ -31,8 +31,6 @@ from pprint import pprint
 
 import tests
 
-from tests.config import get_config
-
 
 class TestNovaAPI(tests.FunctionalTest):
     def build_check(self, id):
@@ -77,16 +75,17 @@ class TestNovaAPI(tests.FunctionalTest):
 
         return self.result
 
-    def test_001_setup(self):
+    def test_000_ghetto_fixup_variables(self):
         """
-        Setup NOVA variables specific to geppetto, see __init.py__ for details
+        This sets specific nova self variables so they
+        are accessible by all other methods
         """
-        self.nova['host'] = self.hosts['openstack-nova-api']['host'][0]
-        self.nova['port'] = self.hosts['openstack-nova-api']['port']
-        self.nova['ver'] = self.hosts['openstack-nova-api']['apiver']
-        self.nova['user'] = self.hosts['openstack-nova-api']['user']
-        self.nova['key'] = self.hosts['openstack-nova-api']['key']
-    test_001_setup.tags = ['olympus', 'nova', 'nova-api']
+        self.nova['host'] = self.config['nova']['host']
+        self.nova['port'] = self.config['nova']['port']
+        self.nova['ver'] = self.config['nova']['apiver']
+        self.nova['user'] = self.config['nova']['user']
+        self.nova['key'] = self.config['nova']['key']
+    test_000_ghetto_fixup_variables.tags = ['olympus', 'nova', 'nova-api']
 
     def test_002_verify_nova_auth(self):
         path = "http://%s:%s/%s" % (self.nova['host'],
@@ -206,7 +205,6 @@ class TestNovaAPI(tests.FunctionalTest):
         response, content = http.request(path, 'GET', headers=headers)
         self.assertEqual(200, response.status)
         self.assertNotEqual('{"limits": []}', content)
-        pprint(content)
     test_109_verify_blank_limits.tags = ['olympus', 'nova', 'nova-api']
 
     def test_110_list_flavors_v1_1(self):
@@ -331,6 +329,7 @@ class TestNovaAPI(tests.FunctionalTest):
     # Uncomment next line for testing
     # def create_multi(self):
     def test_999_create_multiple(self):
+        self.nova['multi_server'] = {}
         path = "http://%s:%s/%s/servers" % (self.nova['host'],
                                             self.nova['port'],
                                             self.nova['ver'])
@@ -361,11 +360,11 @@ class TestNovaAPI(tests.FunctionalTest):
             json_return = json.loads(content)
             self.assertEqual(200, response.status)
             self.assertEqual(json_return['server']['status'], "BUILD")
-            self.multi_server["test %s" % (i)] = json_return['server']['id']
-            self.nova_multi_count = i
+            self.nova['multi_server']["test %s" % (i)] = \
+                        json_return['server']['id']
             time.sleep(30)
 
-        for k, v in self.multi_server.iteritems():
+        for k, v in self.nova['multi_server'].iteritems():
             build_result = self.build_check(v)
             self.assertEqual(build_result['ping'], True)
     test_999_create_multiple.tags = ['olympus', 'nova']
