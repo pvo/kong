@@ -16,7 +16,6 @@ skip = False
 class TestSwiftAccount(tests.FunctionalTest):
 
     def test_metadata(self):
-	pprint(self.hosts)
         if skip:
             raise SkipTest
 
@@ -145,4 +144,3 @@ class TestSwiftAccount(tests.FunctionalTest):
         resp.read()
         self.assertEquals(resp.status, 400)
     test_bad_metadata.tags = ['swift', 'olympus']
-
