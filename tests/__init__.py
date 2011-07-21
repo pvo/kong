@@ -31,6 +31,7 @@ OLYMPUS_HOSTS = {}
 MULTI_SERVER = {}
 CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
 
+
 class skip_test(object):
     """Decorator that skips a test."""
     def __init__(self, msg):
@@ -76,6 +77,7 @@ class skip_unless(object):
         _skipper.__doc__ = func.__doc__
         return _skipper
 
+
 class FunctionalTest(unittest.TestCase):
     def setUp(self):
         global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER, SWIFT_CONF
@@ -99,7 +101,7 @@ class FunctionalTest(unittest.TestCase):
             self._find_geppetto_api_endpoints()
             self._parse_defaults_file()
         # pprint(self.hosts)
-    
+
         self.swift = {
             'auth_host': self.hosts['openstack-swift-proxy']['host'][0],
             'auth_port': self.hosts['openstack-swift-proxy']['auth_port'],
