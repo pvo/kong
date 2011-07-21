@@ -41,10 +41,8 @@ class TestCleanUp(tests.FunctionalTest):
         This sets the host and port self variables so they
         are accessible by all other methods
         """
-        # self.glance['host'] = get_config("glance/host")
-        # self.glance['port'] = get_config("glance/port")
-        self.glance['host'] = self.hosts['openstack-glance-api']['host'][0]
-        self.glance['port'] = self.hosts['openstack-glance-api']['port']
+        self.glance['host'] = self.config['glance']['host']
+        self.glance['port'] = self.config['glance']['port']
     test_000_ghetto_fixup_variables.tags = ['olympus', 'glance', 'nova']
 
     def test_995_delete_server(self):
@@ -60,8 +58,8 @@ class TestCleanUp(tests.FunctionalTest):
     test_995_delete_server.tags = ['olympus', 'nova']
 
     def test_996_delete_multi_server(self):
-        print len(self.multi_server)
-        for k, v in self.multi_server.iteritems():
+        print len(self.nova['multi_server'])
+        for k, v in self.nova['multi_server'].iteritems():
             path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
                                                    self.nova['port'],
                                                    self.nova['ver'],

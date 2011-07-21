@@ -15,21 +15,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import unittest
+import unittest2
 import os
 import ConfigParser
 import nose.plugins.skip
 from hashlib import md5
-from dns import resolver
+# from dns import resolver
 from xmlrpclib import Server
 from pprint import pprint
 
-TEST_DATA = {}
-TEST_NOVA = {}
-SWIFT_CONF = {}
-OLYMPUS_HOSTS = {}
-MULTI_SERVER = {}
-CONFIG_FILE = "/etc/olympus-validation/defaults.ini"
+NOVA_DATA = {}
+GLANCE_DATA = {}
+SWIFT_DATA = {}
+RABBITMQ_DATA = {}
+CONFIG_DATA = {}
 
 
 class skip_test(object):
@@ -78,74 +77,41 @@ class skip_unless(object):
         return _skipper
 
 
-class FunctionalTest(unittest.TestCase):
+class FunctionalTest(unittest2.TestCase):
     def setUp(self):
-        global TEST_DATA, TEST_NOVA, OLYMPUS_HOSTS, MULTI_SERVER, SWIFT_CONF
-        self.glance = TEST_DATA
-        self.nova = TEST_NOVA
-        self.conf = SWIFT_CONF
-        self.resolver = resolver.Resolver(filename='etc/resolv.conf',
-                                          configure=True)
-        self.hosts = OLYMPUS_HOSTS
-        self.multi_server = MULTI_SERVER
+        global GLANCE_DATA, NOVA_DATA, SWIFT_DATA, RABBITMQ_DATA, CONFIG_DATA
+        # Define config dict
+        self.config = CONFIG_DATA
+        # Define service specific dicts
+        self.glance = GLANCE_DATA
+        self.nova = NOVA_DATA
+        self.swift = SWIFT_DATA
+        self.rabbitmq = RABBITMQ_DATA
+#        self.resolver = resolver.Resolver(filename='etc/resolv.conf',
+#                                          configure=True)
 
-        self.geppetto_host = os.getenv('GEPPETTO_HOST')
-        self.hosts['geppetto'] = {}
-        self.hosts['geppetto']['host'] = os.getenv('GEPPETTO_HOST')
-        self.hosts['geppetto']['port'] = os.getenv('GEPPETTO_PORT')
-        self.hosts['geppetto']['path'] = os.getenv('GEPPETTO_PATH')
+        self._parse_defaults_file()
 
-        if os.getenv('OFFLINE_MODE'):
-            self._fake_geppetto()
-        else:
-            self._find_geppetto_api_endpoints()
-            self._parse_defaults_file()
-        pprint(self.hosts)
+#        pprint(self.config)
 
         # Swift Setup
-        self.conf = {
+#        self.swift = {
             # 'auth_host': get_config('swift/auth_host'),
-            'auth_host': self.hosts['openstack-swift-proxy']['host'][0],
-            'auth_port': self.hosts['openstack-swift-proxy']['auth_port'],
-            'auth_prefix': self.hosts['openstack-swift-proxy']['auth_prefix'],
-            'auth_ssl': self.hosts['openstack-swift-proxy']['auth_ssl'],
-            'account': self.hosts['openstack-swift-proxy']['account'],
-            'username': self.hosts['openstack-swift-proxy']['username'],
-            'password': self.hosts['openstack-swift-proxy']['password'],
-         }
             # 'auth_port': get_config('swift/auth_port'),
             # 'auth_prefix': get_config('swift/auth_prefix'),
             # 'auth_ssl': get_config('swift/auth_ssl'),
             # 'account': get_config('swift/account'),
             # 'username': get_config('swift/username'),
-            # 'password': get_config('swift/password'),
+            # 'password': get_config('swift/password')
 
-
-    def _find_geppetto_api_endpoints(self):
-        self.roles = ['openstack-glance-api', 'openstack-nova-api',
-                      'openstack-swift-proxy', 'rabbitmq-server']
-        self.hosts['roles'] = self.roles
-        server = Server("http://%s:%s%s" % (self.hosts['geppetto']['host'],
-                        self.hosts['geppetto']['port'],
-                        self.hosts['geppetto']['path']))
-        for role in self.roles:
-            self.hosts[role] = {}
-            if server.role_has_node(role):
-                self.hosts[role]['host'] = []
-                for entry in server.get_nodes_in_role(role):
-                    query = self.resolver.query(entry[0],
-                                 raise_on_no_answer=True)
-                    self.hosts[role]['host'].append(query[0].address)
-            else:
-                print 'Role [%s] has no member nodes' % role
-
-    def _fake_geppetto(self):
-        self.roles = ['openstack-glance-api', 'openstack-nova-api',
-                      'openstack-swift-proxy', 'rabbitmq-server']
-        self.hosts['roles'] = self.roles
-        for role in self.roles:
-            self.hosts[role] = {}
-            self.hosts[role]['host'] = ['127.0.0.1']
+#            'auth_host': self.hosts['openstack-swift-proxy']['host'][0],
+#            'auth_port': self.hosts['openstack-swift-proxy']['auth_port'],
+#            'auth_prefix': self.hosts['openstack-swift-proxy']['auth_prefix'],
+#            'auth_ssl': self.hosts['openstack-swift-proxy']['auth_ssl'],
+#            'account': self.hosts['openstack-swift-proxy']['account'],
+#            'username': self.hosts['openstack-swift-proxy']['username'],
+#            'password': self.hosts['openstack-swift-proxy']['password'],
+#         }
 
     def _md5sum_file(self, path):
         md5sum = md5()
@@ -167,25 +133,18 @@ class FunctionalTest(unittest.TestCase):
 
     def _parse_defaults_file(self):
         cfg = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                   "..", "etc", "defaults.ini"))
-        if os.path.exists(CONFIG_FILE):
-            self._build_config(CONFIG_FILE)
-        elif os.path.exists(cfg):
+                                   "..", "etc", "config.ini"))
+        if os.path.exists(cfg):
             self._build_config(cfg)
-
-        # if not CONFIG:
-        #    raise Exception("Cannot read config")
+        else:
+            raise Exception("Cannot read %s" % cfg)
 
     def _build_config(self, config_file):
-        if not os.path.exists(config_file):
-            raise Exception("%s does not exists" % (config_file))
-
         parser = ConfigParser.ConfigParser()
         parser.read(config_file)
 
         for section in parser.sections():
-            if section in self.hosts:
-                # pprint(section)
-                for value in parser.options(section):
-                    self.hosts[section][value] = parser.get(section, value)
-                    # print "%s = %s" % (value, parser.get(section, value))
+            self.config[section] = {}
+            for value in parser.options(section):
+                self.config[section][value] = parser.get(section, value)
+                # print "%s = %s" % (value, parser.get(section, value))
