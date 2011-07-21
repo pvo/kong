@@ -339,7 +339,7 @@ class TestNovaAPI(tests.FunctionalTest):
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token']),
                    'Content-Type': 'application/json'}
 
-        for i in range(1, 100):
+        for i in range(1, 10):
             # Change imageRef to self.glance['image_id']
             json_str = {"server":
                 {
