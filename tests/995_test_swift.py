@@ -33,8 +33,19 @@ import tests
 
 from tests.config import get_config
 
+SMALL_OBJ="include/swift_objects/swift_small"
+MED_OBJ="include/swift_objects/swift_medium"
+LRG_OBJ="include/swift_objects/swift_large"
 
 class TestSwift(tests.FunctionalTest):
+    def build_md5sums(self,filename):
+        infile = open(filename, 'rb')
+        content = infile.read()
+        infile.close()
+        m = hashlib.md5()
+        m.update(content)
+        md5 = m.hexdigest()
+        
     def test000_auth(self):
         if self.swift['auth_ssl'] == 'yes':
            prot = "https://"
@@ -82,20 +93,24 @@ class TestSwift(tests.FunctionalTest):
         self.assertLessEqual('1', response['x-account-container-count'])
 
     def test010_create_single_object(self):
-        path = "%s/%s/%s" % (self.swift['storage_url'], "test_container", "object1")
+        md5 = self.build_md5sums(SMALL_OBJ)
+        path = "%s/%s/%s" % (self.swift['storage_url'], "test_container", "swift_small")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         headers = {'X-Auth-User': '%s:%s' % (self.swift['account'], self.swift['username']),
-                   'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
-        response, content = http.request(path, 'PUT', headers=headers)
-        pprint(response)
+                   'X-Storage-Token': '%s' % (self.swift['x-storage-token']),
+                   #'ETag': '%s' % (md5),
+                   'Content-Length': '%d' % os.path.getsize(SMALL_OBJ),
+                   'Content-Type': 'application/octet-stream'}
+        upload = open(SMALL_OBJ, "rb")
+        response, content = http.request(path, 'PUT', headers=headers, body=upload)
 
-    def test019_delete_single_object(self):
-        path = "%s/%s/%s" % (self.swift['storage_url'], "test_container", "object1")
-        http = httplib2.Http(disable_ssl_certificate_validation=True)
-        headers = {'X-Auth-User': '%s:%s' % (self.swift['account'], self.swift['username']),
-                   'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
-        response, content = http.request(path, 'DELETE', headers=headers)
-        pprint(response)
+    # def test019_delete_single_object(self):
+        # path = "%s/%s/%s" % (self.swift['storage_url'], "test_container", "object1")
+        # http = httplib2.Http(disable_ssl_certificate_validation=True)
+        # headers = {'X-Auth-User': '%s:%s' % (self.swift['account'], self.swift['username']),
+                   # 'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
+        # response, content = http.request(path, 'DELETE', headers=headers)
+        # pprint(response)
  
     def test030_check_container_metadata(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")

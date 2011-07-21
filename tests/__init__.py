@@ -95,16 +95,14 @@ class FunctionalTest(unittest2.TestCase):
 #        pprint(self.config)
 
         # Swift Setup
-        self.swift = {
-            'auth_host': self.config['swift']['auth_host'],
-            'auth_port': self.config['swift']['auth_port'],
-            'auth_prefix': self.config['swift']['auth_prefix'],
-            'auth_ssl': self.config['swift']['auth_ssl'],
-            'account': self.config['swift']['account'],
-            'username': self.config['swift']['username'],
-            'password': self.config['swift']['password'],
-            'ver': 'v1.0' # need to find a better way to get this.
-         }
+        self.swift['auth_host'] = self.config['swift']['auth_host']
+        self.swift['auth_port'] = self.config['swift']['auth_port']
+        self.swift['auth_prefix'] = self.config['swift']['auth_prefix']
+        self.swift['auth_ssl'] = self.config['swift']['auth_ssl']
+        self.swift['account'] = self.config['swift']['account']
+        self.swift['username'] = self.config['swift']['username']
+        self.swift['password'] = self.config['swift']['password']
+        self.swift['ver'] = 'v1.0' # need to find a better way to get this.
 
     def _md5sum_file(self, path):
         md5sum = md5()
