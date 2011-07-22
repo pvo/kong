@@ -92,8 +92,14 @@ class FunctionalTest(unittest2.TestCase):
 
         self._parse_defaults_file()
 
-#        pprint(self.config)
 
+        # Geppetto Setup (olympus)
+        self.config['geppetto'] = {}
+        self.config['geppetto']['host'] = os.environ['GEPPETTO_HOST']
+        self.config['geppetto']['port'] = os.environ['GEPPETTO_PORT']
+        self.config['geppetto']['path'] = os.environ['GEPPETTO_PATH']
+
+        # pprint(self.config)
         # Swift Setup
         self.swift['auth_host'] = self.config['swift']['auth_host']
         self.swift['auth_port'] = self.config['swift']['auth_port']
