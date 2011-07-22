@@ -102,7 +102,7 @@ class FunctionalTest(unittest2.TestCase):
         self.swift['account'] = self.config['swift']['account']
         self.swift['username'] = self.config['swift']['username']
         self.swift['password'] = self.config['swift']['password']
-        self.swift['ver'] = 'v1.0' # need to find a better way to get this.
+        self.swift['ver'] = 'v1.0'  # need to find a better way to get this.
 
     def _md5sum_file(self, path):
         md5sum = md5()
