@@ -39,7 +39,7 @@ LRG_OBJ = "include/swift_objects/swift_large"
 
 
 class TestSwift(tests.FunctionalTest):
-    def test000_auth(self):
+    def test_000_auth(self):
         if self.swift['auth_ssl'] == 'yes':
             prot = "https://"
         else:
@@ -76,9 +76,9 @@ class TestSwift(tests.FunctionalTest):
                                                       self.swift['auth_host'],
                                                       url[3],
                                                       url[4])
-    test000_auth.tags = ['olympus', 'swift']
+    test_000_auth.tags = ['swift']
 
-    def test001_create_container(self):
+    def test_001_create_container(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
@@ -86,18 +86,18 @@ class TestSwift(tests.FunctionalTest):
                    'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
         response, content = http.request(path, 'PUT', headers=headers)
         self.assertEqual(201, response.status)
-    test001_create_container.tags = ['olympus', 'swift']
+    test_001_create_container.tags = ['swift']
 
-    def test002_list_containers(self):
+    def test_002_list_containers(self):
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         headers = {'X-Auth-Token': '%s' % (self.swift['x-auth-token'])}
         response, content = http.request(self.swift['storage_url'], 'GET',
                                          headers=headers)
         self.assertEqual(200, response.status)
         self.assertLessEqual('1', response['x-account-container-count'])
-    test002_list_containers.tags = ['olympus', 'swift']
+    test_002_list_containers.tags = ['swift']
 
-    def test010_create_small_object(self):
+    def test_010_create_small_object(self):
         md5 = self._md5sum_file(SMALL_OBJ)
         path = "%s/%s/%s" % (self.swift['storage_url'],
                              "test_container",
@@ -115,9 +115,10 @@ class TestSwift(tests.FunctionalTest):
                                          body=upload)
         self.assertEqual(201, response.status)
         self.assertIn('201', content)
-    test010_create_small_object.tags = ['olympus', 'swift']
+    test_010_create_small_object.tags = ['swift']
 
-    def test011_create_medium_object(self):
+    @tests.skip_test("Skipping due to known issue with cactus")
+    def test_011_create_medium_object(self):
         md5 = self._md5sum_file(MED_OBJ)
         path = "%s/%s/%s" % (self.swift['storage_url'],
                              "test_container",
@@ -138,9 +139,9 @@ class TestSwift(tests.FunctionalTest):
                                          headers=headers,
                                          body=upload)
         self.assertEqual(201, response.status)
-    test011_create_medium_object.tags = ['olympus', 'swift']
+    test_011_create_medium_object.tags = ['swift']
 
-    def test013_get_small_object(self):
+    def test_013_get_small_object(self):
         path = "%s/%s/%s" % (self.swift['storage_url'],
                              "test_container",
                              "swift_small")
@@ -152,9 +153,9 @@ class TestSwift(tests.FunctionalTest):
                                          headers=headers)
         self.assertEqual(200, response.status)
         self.assertEqual(self._md5sum_file(SMALL_OBJ), response['etag'])
-    test013_get_small_object.tags = ['olympus', 'swift']
+    test_013_get_small_object.tags = ['swift']
 
-    def test017_delete_small_object(self):
+    def test_017_delete_small_object(self):
         path = "%s/%s/%s" % (self.swift['storage_url'], "test_container",
                              "swift_small")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
@@ -164,9 +165,10 @@ class TestSwift(tests.FunctionalTest):
                                               self.swift['x-storage-token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(204, response.status)
-    test017_delete_small_object.tags = ['olympus', 'swift']
+    test_017_delete_small_object.tags = ['swift']
 
-    def test018_delete_medium_object(self):
+    @tests.skip_test("Skipping due to known issue with cactus")
+    def test_018_delete_medium_object(self):
         path = "%s/%s/%s" % (self.swift['storage_url'], "test_container",
                              "swift_medium")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
@@ -176,9 +178,9 @@ class TestSwift(tests.FunctionalTest):
                                               self.swift['x-storage-token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(204, response.status)
-    test017_delete_small_object.tags = ['olympus', 'swift']
+    test_017_delete_small_object.tags = ['swift']
 
-    def test030_check_container_metadata(self):
+    def test_030_check_container_metadata(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
@@ -187,9 +189,9 @@ class TestSwift(tests.FunctionalTest):
         response, content = http.request(path, 'HEAD', headers=headers)
         self.assertEqual(204, response.status)
         # pprint(response)
-    test030_check_container_metadata.tags = ['olympus', 'swift']
+    test_030_check_container_metadata.tags = ['swift']
 
-    def test050_delete_container(self):
+    def test_050_delete_container(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
@@ -197,4 +199,4 @@ class TestSwift(tests.FunctionalTest):
                    'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(204, response.status)
-    test050_delete_container.tags = ['olympus', 'swift']
+    test_050_delete_container.tags = ['swift']
