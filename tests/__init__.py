@@ -87,19 +87,9 @@ class FunctionalTest(unittest2.TestCase):
         self.nova = NOVA_DATA
         self.swift = SWIFT_DATA
         self.rabbitmq = RABBITMQ_DATA
-#        self.resolver = resolver.Resolver(filename='etc/resolv.conf',
-#                                          configure=True)
 
         self._parse_defaults_file()
 
-
-        # Geppetto Setup (olympus)
-        self.config['geppetto'] = {}
-        self.config['geppetto']['host'] = os.environ['GEPPETTO_HOST']
-        self.config['geppetto']['port'] = os.environ['GEPPETTO_PORT']
-        self.config['geppetto']['path'] = os.environ['GEPPETTO_PATH']
-
-        # pprint(self.config)
         # Swift Setup
         self.swift['auth_host'] = self.config['swift']['auth_host']
         self.swift['auth_port'] = self.config['swift']['auth_port']
