@@ -153,7 +153,6 @@ class TestSwift(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         self.assertEqual(self._md5sum_file(SMALL_OBJ), response['etag'])
     test013_get_small_object.tags = ['olympus', 'swift']
-       
 
     def test017_delete_small_object(self):
         path = "%s/%s/%s" % (self.swift['storage_url'], "test_container",
