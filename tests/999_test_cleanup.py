@@ -44,8 +44,7 @@ class TestCleanUp(tests.FunctionalTest):
     test_995_delete_server.tags = ['nova']
 
     def test_996_delete_multi_server(self):
-        print "Deleting %s instances." % (self.nova_multi_count)
-        print len(self.nova['multi_server'])
+        print "Deleting %s instances." % (len(self.nova['multi_server']))
         for k, v in self.nova['multi_server'].iteritems():
             path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
                                                    self.nova['port'],
