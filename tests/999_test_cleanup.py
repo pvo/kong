@@ -28,23 +28,8 @@ import hashlib
 from pprint import pprint
 
 import tests
-from tests.config import get_config
-
-# GLANCE API TESTS Variables
-# TEST_HOST = get_config("glance/host")
-# TEST_PORT = get_config("glance/port")
-
 
 class TestCleanUp(tests.FunctionalTest):
-    def test_000_ghetto_fixup_variables(self):
-        """
-        This sets the host and port self variables so they
-        are accessible by all other methods
-        """
-        self.glance['host'] = self.config['glance']['host']
-        self.glance['port'] = self.config['glance']['port']
-    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance', 'nova']
-
     def test_995_delete_server(self):
         path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
                                                self.nova['port'],
@@ -55,9 +40,10 @@ class TestCleanUp(tests.FunctionalTest):
                    'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(202, response.status)
-    test_995_delete_server.tags = ['olympus', 'nova']
+    test_995_delete_server.tags = ['nova']
 
     def test_996_delete_multi_server(self):
+        print "Deleting %s instances." % (self.nova_multi_count)
         print len(self.nova['multi_server'])
         for k, v in self.nova['multi_server'].iteritems():
             path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
@@ -69,7 +55,7 @@ class TestCleanUp(tests.FunctionalTest):
                        'X-Auth-Token': '%s' % (self.nova['X-Auth-Token'])}
             response, content = http.request(path, 'DELETE', headers=headers)
             self.assertEqual(202, response.status)
-    test_996_delete_multi_server.tags = ['olympus', 'nova']
+    test_996_delete_multi_server.tags = ['nova']
 
     def test_997_delete_kernel_from_glance(self):
         path = "http://%s:%s/images/%s" % (self.glance['host'],
@@ -78,7 +64,7 @@ class TestCleanUp(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
-    test_997_delete_kernel_from_glance.tags = ['olympus', 'glance', 'nova']
+    test_997_delete_kernel_from_glance.tags = ['glance', 'nova']
 
     def test_998_delete_initrd_from_glance(self):
         path = "http://%s:%s/images/%s" % (self.glance['host'],
@@ -87,14 +73,13 @@ class TestCleanUp(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
-    test_998_delete_initrd_from_glance.tags = ['olympus', 'glance', 'nova']
+    test_998_delete_initrd_from_glance.tags = ['glance', 'nova']
 
     def test_999_delete_image_from_glance(self):
-        print "Deleting %s instances." % (self.nova_multi_count)
         path = "http://%s:%s/images/%s" % (self.glance['host'],
                                            self.glance['port'],
                                            self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
-    test_999_delete_image_from_glance.tags = ['olympus', 'glance', 'nova']
+    test_999_delete_image_from_glance.tags = ['glance', 'nova']
