@@ -100,6 +100,10 @@ class FunctionalTest(unittest2.TestCase):
         self.swift['password'] = self.config['swift']['password']
         self.swift['ver'] = 'v1.0'  # need to find a better way to get this.
 
+        # Glance Setup
+        self.glance['host'] = self.config['glance']['host']
+        self.glance['port'] = self.config['glance']['port']
+
     def _md5sum_file(self, path):
         md5sum = md5()
         with open(path, 'rb') as file:

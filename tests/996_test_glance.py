@@ -25,15 +25,6 @@ import tests
 
 
 class TestGlanceAPI(tests.FunctionalTest):
-    def test_000_ghetto_fixup_variables(self):
-        """
-        This sets the host and port self variables so they
-        are accessible by all other methods
-        """
-        self.glance['host'] = self.config['glance']['host']
-        self.glance['port'] = self.config['glance']['port']
-    test_000_ghetto_fixup_variables.tags = ['olympus', 'glance', 'nova']
-
     def test_001_connect_to_glance_api(self):
         """
         Verifies ability to connect to glance api,
@@ -46,7 +37,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.assertEqual(200, response.status)
         data = json.loads(content)
         self.assertTrue('images' in data)
-    test_001_connect_to_glance_api.tags = ['olympus', 'glance']
+    test_001_connect_to_glance_api.tags = ['glance']
 
     def test_002_upload_kernel_to_glance(self):
         """
@@ -72,7 +63,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['kernel_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-kernel")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(kernel))
-    test_002_upload_kernel_to_glance.tags = ['olympus', 'glance', 'nova']
+    test_002_upload_kernel_to_glance.tags = ['glance', 'nova']
 
     def test_003_upload_initrd_to_glance(self):
         """
@@ -99,7 +90,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['ramdisk_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-ramdisk")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(initrd))
-    test_003_upload_initrd_to_glance.tags = ['olympus', 'glance', 'nova']
+    test_003_upload_initrd_to_glance.tags = ['glance', 'nova']
 
     def test_004_upload_image_to_glance(self):
         """
@@ -132,7 +123,7 @@ class TestGlanceAPI(tests.FunctionalTest):
         self.glance['image_id'] = data['image']['id']
         self.assertEqual(data['image']['name'], "test-image")
         self.assertEqual(data['image']['checksum'], self._md5sum_file(image))
-    test_004_upload_image_to_glance.tags = ['olympus', 'glance', 'nova']
+    test_004_upload_image_to_glance.tags = ['glance', 'nova']
 
     def test_005_set_image_meta_property(self):
         path = "http://%s:%s/images/%s" % (self.glance['host'],
@@ -154,7 +145,7 @@ class TestGlanceAPI(tests.FunctionalTest):
                          str(self.glance['kernel_id']))
         self.assertEqual(data['image']['properties']['ramdisk_id'],
                          str(self.glance['ramdisk_id']))
-    test_005_set_image_meta_property.tags = ['olympus', 'glance']
+    test_005_set_image_meta_property.tags = ['glance']
 
     def test_006_list_image_metadata(self):
         image = "sample_vm/ubuntu-lucid.img"
@@ -175,4 +166,4 @@ class TestGlanceAPI(tests.FunctionalTest):
                          str(self.glance['kernel_id']))
         self.assertEqual(response['x-image-meta-property-ramdisk_id'],
                          str(self.glance['ramdisk_id']))
-    test_006_list_image_metadata.tags = ['olympus', 'glance']
+    test_006_list_image_metadata.tags = ['glance']
