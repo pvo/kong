@@ -288,19 +288,6 @@ if __name__ == '__main__':
         else:
             argv.append(x)
 
-    if not os.getenv('GEPPETTO_HOST'):
-        print 'Missing GEPPETTO environment variable. Please ' \
-              'export GEPPETTO_HOST before running this test.'
-        sys.exit(1)
-    elif not os.getenv('GEPPETTO_PORT'):
-        print 'Missing GEPPETTO environment variable. Please ' \
-              'export GEPPETTO_PATH before running this test.'
-        sys.exit(1)
-    elif not os.getenv('GEPPETTO_PATH'):
-        print 'Missing GEPPETTO environment variable. Please ' \
-              'export GEPPETTO_PATH before running this test.'
-        sys.exit(1)
-
     c = config.Config(stream=sys.stdout,
                       env=os.environ,
                       verbosity=3,
