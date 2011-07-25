@@ -178,7 +178,7 @@ class TestSwift(tests.FunctionalTest):
                                               self.swift['x-storage-token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(204, response.status)
-    test_017_delete_small_object.tags = ['swift']
+    test_018_delete_medium_object.tags = ['swift']
 
     def test_030_check_container_metadata(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")
