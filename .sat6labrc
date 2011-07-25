@@ -1,3 +1,0 @@
-export GEPPETTO_HOST=10.127.52.120
-export GEPPETTO_PORT=8080
-export GEPPETTO_PATH="/openstack/geppetto"
