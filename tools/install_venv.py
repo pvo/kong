@@ -1,7 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 """
-Installation script for Olympus's testing virtualenv
+Installation script for Kong's testing virtualenv
 """
 
 import os
@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-VENV = os.path.join(ROOT, '.olympus-venv')
+VENV = os.path.join(ROOT, '.kong-venv')
 PIP_REQUIRES = os.path.join(ROOT, 'tools', 'pip-requires')
 
 
@@ -105,15 +105,15 @@ def install_dependencies(venv=VENV):
 
 def print_help():
     help = """
- Olympus testing environment setup is complete.
+ Kong testing environment setup is complete.
 
- Olympus testing uses virtualenv to track and manage Python dependencies
+ Kong testing uses virtualenv to track and manage Python dependencies
  while in development and testing.
 
- To activate the Olympus virtualenv for the extent of your current shell
+ To activate the Kong virtualenv for the extent of your current shell
  session you can run:
 
- $ source .olympus-venv/bin/activate
+ $ source .kong-venv/bin/activate
 
  Or, if you prefer, you can run commands in the virtualenv on a case by case
  basis by running:

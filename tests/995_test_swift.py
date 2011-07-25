@@ -17,21 +17,18 @@
 
 """Functional test case for OpenStack Swift """
 
+import hashlib
+import httplib2
 import json
 import os
 import tempfile
-import unittest
-import httplib2
-import urllib
-import hashlib
 import time
-import os
+import unittest
+import urllib
 
 from pprint import pprint
 
 import tests
-
-from tests.config import get_config
 
 SMALL_OBJ = "include/swift_objects/swift_small"
 MED_OBJ = "include/swift_objects/swift_medium"

@@ -135,7 +135,7 @@ def get_elapsed_time_color(elapsed_time):
         return 'green'
 
 
-class OlympusTestResult(result.TextTestResult):
+class KongTestResult(result.TextTestResult):
     def __init__(self, *args, **kw):
         self.show_elapsed = kw.pop('show_elapsed')
         result.TextTestResult.__init__(self, *args, **kw)
@@ -246,13 +246,13 @@ class OlympusTestResult(result.TextTestResult):
             self.stream.flush()
 
 
-class OlympusTestRunner(core.TextTestRunner):
+class KongTestRunner(core.TextTestRunner):
     def __init__(self, *args, **kwargs):
         self.show_elapsed = kwargs.pop('show_elapsed')
         core.TextTestRunner.__init__(self, *args, **kwargs)
 
     def _makeResult(self):
-        return OlympusTestResult(self.stream,
+        return KongTestResult(self.stream,
                               self.descriptions,
                               self.verbosity,
                               self.config,
@@ -293,7 +293,7 @@ if __name__ == '__main__':
                       verbosity=3,
                       plugins=core.DefaultPluginManager())
 
-    runner = OlympusTestRunner(stream=c.stream,
+    runner = KongTestRunner(stream=c.stream,
                             verbosity=c.verbosity,
                             config=c,
                             show_elapsed=show_elapsed)

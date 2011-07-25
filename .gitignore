@@ -1,4 +1,4 @@
-.olympus-venv
+.kong-venv
 *.pyc
 sample_vm/initrd.img-2.6.32-23-server
 sample_vm/ubuntu-lucid.img

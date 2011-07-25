@@ -1,4 +1,4 @@
 #!/bin/bash
 TOOLS=`dirname $0`
-VENV=$TOOLS/../.olympus-venv
+VENV=$TOOLS/../.kong-venv
 source $VENV/bin/activate && $@
