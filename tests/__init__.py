@@ -15,14 +15,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import unittest2
-import os
 import ConfigParser
-import nose.plugins.skip
 from hashlib import md5
-# from dns import resolver
+import nose.plugins.skip
+import os
+import unittest2
 from xmlrpclib import Server
-from pprint import pprint
 
 NOVA_DATA = {}
 GLANCE_DATA = {}
