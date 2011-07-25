@@ -30,7 +30,11 @@ class TestGlanceAPI(tests.FunctionalTest):
         Verifies ability to connect to glance api,
         expects glance to return an empty set
         """
-        path = "http://%s:%s/images" % (self.glance['host'],
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'])
+        else:
+            path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         http = httplib2.Http()
         response, content = http.request(path, 'GET')
@@ -44,7 +48,11 @@ class TestGlanceAPI(tests.FunctionalTest):
         Uploads a test kernal to glance api
         """
         kernel = "sample_vm/vmlinuz-2.6.32-23-server"
-        path = "http://%s:%s/images" % (self.glance['host'],
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'])
+        else:
+            path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-kernel',
@@ -70,7 +78,11 @@ class TestGlanceAPI(tests.FunctionalTest):
         Uploads a test initrd to glance api
         """
         initrd = "sample_vm/initrd.img-2.6.32-23-server"
-        path = "http://%s:%s/images" % (self.glance['host'],
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'])
+        else:
+            path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-ramdisk',
@@ -102,7 +114,11 @@ class TestGlanceAPI(tests.FunctionalTest):
         upload_data = ""
         for chunk in self._read_in_chunks(image):
             upload_data += chunk
-        path = "http://%s:%s/images" % (self.glance['host'],
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'])
+        else:
+            path = "http://%s:%s/images" % (self.glance['host'],
                                         self.glance['port'])
         headers = {'x-image-meta-is-public': 'true',
                    'x-image-meta-name': 'test-image',
@@ -126,9 +142,13 @@ class TestGlanceAPI(tests.FunctionalTest):
     test_004_upload_image_to_glance.tags = ['glance', 'nova']
 
     def test_005_set_image_meta_property(self):
-        path = "http://%s:%s/images/%s" % (self.glance['host'],
-                                           self.glance['port'],
-                                           self.glance['image_id'])
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
+                           self.glance['port'], self.glance['apiver'],
+                           self.glance['image_id'])
+        else:
+            path = "http://%s:%s/images/%s" % (self.glance['host'],
+                           self.glance['port'], self.glance['image_id'])
         headers = {'X-Image-Meta-Property-Distro': 'Ubuntu',
                    'X-Image-Meta-Property-Arch': 'x86_64',
                    'X-Image-Meta-Property-Kernel_id': '%s' % \
@@ -149,9 +169,13 @@ class TestGlanceAPI(tests.FunctionalTest):
 
     def test_006_list_image_metadata(self):
         image = "sample_vm/ubuntu-lucid.img"
-        path = "http://%s:%s/images/%s" % (self.glance['host'],
-                                           self.glance['port'],
-                                           self.glance['image_id'])
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
+                           self.glance['port'], self.glance['apiver'],
+                           self.glance['image_id'])
+        else:
+            path = "http://%s:%s/images/%s" % (self.glance['host'],
+                           self.glance['port'], self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'HEAD')
         self.assertEqual(response.status, 200)

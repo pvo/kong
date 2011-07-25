@@ -101,6 +101,8 @@ class FunctionalTest(unittest2.TestCase):
         # Glance Setup
         self.glance['host'] = self.config['glance']['host']
         self.glance['port'] = self.config['glance']['port']
+        if 'apiver' in self.config['glance']:
+            self.glance['apiver'] = self.config['glance']['apiver']
 
     def _md5sum_file(self, path):
         md5sum = md5()

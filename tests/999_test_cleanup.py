@@ -58,27 +58,39 @@ class TestCleanUp(tests.FunctionalTest):
     test_996_delete_multi_server.tags = ['nova']
 
     def test_997_delete_kernel_from_glance(self):
-        path = "http://%s:%s/images/%s" % (self.glance['host'],
-                                           self.glance['port'],
-                                           self.glance['kernel_id'])
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'],
+                          self.glance['kernel_id'])
+        else:
+            path = "http://%s:%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['kernel_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
     test_997_delete_kernel_from_glance.tags = ['glance', 'nova']
 
     def test_998_delete_initrd_from_glance(self):
-        path = "http://%s:%s/images/%s" % (self.glance['host'],
-                                           self.glance['port'],
-                                           self.glance['ramdisk_id'])
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'],
+                          self.glance['kernel_id'])
+        else:
+            path = "http://%s:%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['ramdisk_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
     test_998_delete_initrd_from_glance.tags = ['glance', 'nova']
 
     def test_999_delete_image_from_glance(self):
-        path = "http://%s:%s/images/%s" % (self.glance['host'],
-                                           self.glance['port'],
-                                           self.glance['image_id'])
+        if 'apiver' in self.glance:
+            path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['apiver'],
+                          self.glance['kernel_id'])
+        else:
+            path = "http://%s:%s/images/%s" % (self.glance['host'],
+                          self.glance['port'], self.glance['image_id'])
         http = httplib2.Http()
         response, content = http.request(path, 'DELETE')
         self.assertEqual(200, response.status)
