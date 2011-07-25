@@ -29,6 +29,7 @@ from pprint import pprint
 
 import tests
 
+
 class TestCleanUp(tests.FunctionalTest):
     def test_995_delete_server(self):
         path = "http://%s:%s/%s/servers/%s" % (self.nova['host'],
