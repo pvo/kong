@@ -39,15 +39,6 @@ LRG_OBJ = "include/swift_objects/swift_large"
 
 
 class TestSwift(tests.FunctionalTest):
-    def build_md5sums(self, filename):
-        infile = open(filename, 'rb')
-        content = infile.read()
-        infile.close()
-        m = hashlib.md5()
-        m.update(content)
-        md5 = m.hexdigest()
-        return md5
-
     def test000_auth(self):
         if self.swift['auth_ssl'] == 'yes':
             prot = "https://"
@@ -58,6 +49,9 @@ class TestSwift(tests.FunctionalTest):
                                       self.swift['auth_port'],
                                       self.swift['auth_prefix'],
                                       self.swift['ver'])
+
+        # Uncomment for debugging
+        # pprint(path)
 
         http = httplib2.Http(disable_ssl_certificate_validation=True)
         self.swift['auth_user'] = '%s:%s' % (self.swift['account'],
@@ -103,8 +97,8 @@ class TestSwift(tests.FunctionalTest):
         self.assertLessEqual('1', response['x-account-container-count'])
     test002_list_containers.tags = ['olympus', 'swift']
 
-    def test010_create_single_object(self):
-        md5 = self.build_md5sums(SMALL_OBJ)
+    def test010_create_small_object(self):
+        md5 = self._md5sum_file(SMALL_OBJ)
         path = "%s/%s/%s" % (self.swift['storage_url'],
                              "test_container",
                              "swift_small")
@@ -121,9 +115,47 @@ class TestSwift(tests.FunctionalTest):
                                          body=upload)
         self.assertEqual(201, response.status)
         self.assertIn('201', content)
-    test010_create_single_object.tags = ['olympus', 'swift']
+    test010_create_small_object.tags = ['olympus', 'swift']
 
-    def test019_delete_single_object(self):
+    def test011_create_medium_object(self):
+        md5 = self._md5sum_file(MED_OBJ)
+        path = "%s/%s/%s" % (self.swift['storage_url'],
+                             "test_container",
+                             "swift_medium")
+        http = httplib2.Http(disable_ssl_certificate_validation=True)
+        headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
+                                             self.swift['username']),
+                   'X-Storage-Token': '%s' % (self.swift['x-storage-token']),
+                   'ETag': '%s' % (md5),
+                   'Transfer-Encoding': 'chunked',
+                   'Content-Length': '%d' % (os.path.getsize(MED_OBJ)),
+                   'Content-Type': 'application/octet-stream',
+                   'Content-Encoding': 'gzip'}
+        upload = ""
+        for chunk in self._read_in_chunks(MED_OBJ):
+            upload += chunk
+        response, content = http.request(path, 'PUT',
+                                         headers=headers,
+                                         body=upload)
+        self.assertEqual(201, response.status)
+    test011_create_medium_object.tags = ['olympus', 'swift']
+
+    def test013_get_small_object(self):
+        path = "%s/%s/%s" % (self.swift['storage_url'],
+                             "test_container",
+                             "swift_small")
+        http = httplib2.Http(disable_ssl_certificate_validation=True)
+        headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
+                                             self.swift['username']),
+                   'X-Storage-Token': '%s' % (self.swift['x-storage-token'])}
+        response, content = http.request(path, 'GET',
+                                         headers=headers)
+        self.assertEqual(200, response.status)
+        self.assertEqual(self._md5sum_file(SMALL_OBJ), response['etag'])
+    test013_get_small_object.tags = ['olympus', 'swift']
+       
+
+    def test017_delete_small_object(self):
         path = "%s/%s/%s" % (self.swift['storage_url'], "test_container",
                              "swift_small")
         http = httplib2.Http(disable_ssl_certificate_validation=True)
@@ -133,7 +165,19 @@ class TestSwift(tests.FunctionalTest):
                                               self.swift['x-storage-token'])}
         response, content = http.request(path, 'DELETE', headers=headers)
         self.assertEqual(204, response.status)
-    test019_delete_single_object.tags = ['olympus', 'swift']
+    test017_delete_small_object.tags = ['olympus', 'swift']
+
+    def test018_delete_medium_object(self):
+        path = "%s/%s/%s" % (self.swift['storage_url'], "test_container",
+                             "swift_medium")
+        http = httplib2.Http(disable_ssl_certificate_validation=True)
+        headers = {'X-Auth-User': '%s:%s' % (self.swift['account'],
+                                             self.swift['username']),
+                   'X-Storage-Token': '%s' % (
+                                              self.swift['x-storage-token'])}
+        response, content = http.request(path, 'DELETE', headers=headers)
+        self.assertEqual(204, response.status)
+    test017_delete_small_object.tags = ['olympus', 'swift']
 
     def test030_check_container_metadata(self):
         path = "%s/%s" % (self.swift['storage_url'], "test_container")
