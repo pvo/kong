@@ -92,15 +92,11 @@ class TestNovaAPI(tests.FunctionalTest):
         http = httplib2.Http()
         response, content = http.request(path, 'HEAD', headers=headers)
         self.assertEqual(204, response.status)
-        self.assertEqual(len(response['x-auth-token']), 40)
-        self.assertEqual(response['x-cdn-management-url'], "")
-        self.assertEqual(response['x-storage-url'], "")
+        self.assertNotEqual(response['x-auth-token'], '')
+        self.assertNotEqual(response['x-server-management-url'], '')
 
         # Set up Auth Token for all future API interactions
         self.nova['X-Auth-Token'] = response['x-auth-token']
-#        for key, val in response.items():
-#            if (key == 'x-auth-token'):
-#                self.nova['X-Auth-Token'] = val
     test_002_verify_nova_auth.tags = ['nova', 'nova-api']
 
     def test_101_verify_version_selection_default(self):
@@ -135,11 +131,15 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertTrue('<versions>' in content)
     test_103_verify_version_selection_xml.tags = ['nova', 'nova-api']
 
-    @tests.skip_test("Skipping -- Keystone/Nova Auth")
     def test_104_bad_user_bad_key(self):
-        path = "http://%s:%s/%s/" % (self.nova['host'],
-                                           self.nova['port'],
-                                           self.nova['ver'])
+        if 'keystone' in self.config:
+            path = "http://%s:%s/%s" % (self.keystone['host'],
+                                       self.keystone['port'],
+                                       self.keystone['apiver'])
+        else:
+            path = "http://%s:%s/%s" % (self.nova['host'],
+                                        self.nova['port'],
+                                        self.nova['ver'])
         http = httplib2.Http()
         headers = {'X-Auth-User': 'unknown_auth_user',
                   'X-Auth-Key': 'unknown_auth_key'}
@@ -147,11 +147,15 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(response.status, 401)
     test_104_bad_user_bad_key.tags = ['nova', 'nova-api']
 
-    @tests.skip_test("Skipping -- Keystone/Nova Auth")
     def test_105_bad_user_good_key(self):
-        path = "http://%s:%s/%s/" % (self.nova['host'],
-                                           self.nova['port'],
-                                           self.nova['ver'])
+        if 'keystone' in self.config:
+            path = "http://%s:%s/%s" % (self.keystone['host'],
+                                       self.keystone['port'],
+                                       self.keystone['apiver'])
+        else:
+            path = "http://%s:%s/%s" % (self.nova['host'],
+                                        self.nova['port'],
+                                        self.nova['ver'])
         http = httplib2.Http()
         headers = {'X-Auth-User': 'unknown_auth_user',
                   'X-Auth-Key': self.nova['key']}
@@ -159,11 +163,15 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(response.status, 401)
     test_105_bad_user_good_key.tags = ['nova', 'nova-api']
 
-    @tests.skip_test("Skipping -- Keystone/Nova Auth")
     def test_106_good_user_bad_key(self):
-        path = "http://%s:%s/%s/" % (self.nova['host'],
-                                           self.nova['port'],
-                                           self.nova['ver'])
+        if 'keystone' in self.config:
+            path = "http://%s:%s/%s" % (self.keystone['host'],
+                                       self.keystone['port'],
+                                       self.keystone['apiver'])
+        else:
+            path = "http://%s:%s/%s" % (self.nova['host'],
+                                        self.nova['port'],
+                                        self.nova['ver'])
         http = httplib2.Http()
         headers = {'X-Auth-User': self.nova['user'],
                   'X-Auth-Key': 'unknown_auth_key'}
@@ -171,11 +179,15 @@ class TestNovaAPI(tests.FunctionalTest):
         self.assertEqual(response.status, 401)
     test_106_good_user_bad_key.tags = ['nova', 'nova-api']
 
-    @tests.skip_test("Skipping -- Keystone/Nova Auth")
     def test_107_no_key(self):
-        path = "http://%s:%s/%s/" % (self.nova['host'],
-                                           self.nova['port'],
-                                           self.nova['ver'])
+        if 'keystone' in self.config:
+            path = "http://%s:%s/%s" % (self.keystone['host'],
+                                       self.keystone['port'],
+                                       self.keystone['apiver'])
+        else:
+            path = "http://%s:%s/%s" % (self.nova['host'],
+                                        self.nova['port'],
+                                        self.nova['ver'])
         http = httplib2.Http()
         headers = {'X-Auth-User': self.nova['user']}
         response, content = http.request(path, 'GET', headers=headers)
@@ -183,9 +195,14 @@ class TestNovaAPI(tests.FunctionalTest):
     test_107_no_key.tags = ['nova', 'nova-api']
 
     def test_108_bad_token(self):
-        path = "http://%s:%s/%s/" % (self.nova['host'],
-                                           self.nova['port'],
-                                           self.nova['ver'])
+        if 'keystone' in self.config:
+            path = "http://%s:%s/%s" % (self.keystone['host'],
+                                       self.keystone['port'],
+                                       self.keystone['apiver'])
+        else:
+            path = "http://%s:%s/%s" % (self.nova['host'],
+                                        self.nova['port'],
+                                        self.nova['ver'])
         http = httplib2.Http()
         headers = {'X-Auth-Token': 'unknown_token'}
         response, content = http.request(path, 'GET', headers=headers)
@@ -290,10 +307,11 @@ class TestNovaAPI(tests.FunctionalTest):
                 "flavorRef": "http://%s:%s/%s/flavors/2" % (self.nova['host'],
                                                       self.nova['port'],
                                                       self.nova['ver']),
-                "imageRef": "http://%s:%s/%s/images/%s" % (self.nova['host'],
-                                                      self.nova['port'],
-                                                      self.nova['ver'],
-                                                      self.glance['image_id'])
+                "imageRef": self.glance['image_id']
+#                "imageRef": "http://%s:%s/%s/images/%s" % (self.nova['host'],
+#                                                      self.nova['port'],
+#                                                      self.nova['ver'],
+#                                                      self.glance['image_id'])
             }
         }
         data = json.dumps(json_str)
@@ -341,15 +359,16 @@ class TestNovaAPI(tests.FunctionalTest):
             json_str = {"server":
                 {
                     "name": "test %s" % (i),
-                    "flavorRef": "http://%s:%s/%s/flavors/3" % (
+                    "flavorRef": "http://%s:%s/%s/flavors/2" % (
                                                    self.nova['host'],
                                                    self.nova['port'],
                                                    self.nova['ver']),
-                    "imageRef": "http://%s:%s/%s/images/%s" % (
-                                                   self.nova['host'],
-                                                   self.nova['port'],
-                                                   self.nova['ver'],
-                                                   self.glance['image_id'])
+                    "imageRef": self.glance['image_id']
+#                    "imageRef": "http://%s:%s/%s/images/%s" % (
+#                                                   self.nova['host'],
+#                                                   self.nova['port'],
+#                                                   self.nova['ver'],
+#                                                   self.glance['image_id'])
                 }
             }
             data = json.dumps(json_str)
