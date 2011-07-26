@@ -27,7 +27,7 @@ GLANCE_DATA = {}
 SWIFT_DATA = {}
 RABBITMQ_DATA = {}
 CONFIG_DATA = {}
-
+KEYSTONE_DATA = {}
 
 class skip_test(object):
     """Decorator that skips a test."""
@@ -77,7 +77,7 @@ class skip_unless(object):
 
 class FunctionalTest(unittest2.TestCase):
     def setUp(self):
-        global GLANCE_DATA, NOVA_DATA, SWIFT_DATA, RABBITMQ_DATA, CONFIG_DATA
+        global GLANCE_DATA, NOVA_DATA, SWIFT_DATA, RABBITMQ_DATA, KEYSTONE_DATA, CONFIG_DATA
         # Define config dict
         self.config = CONFIG_DATA
         # Define service specific dicts
@@ -85,6 +85,7 @@ class FunctionalTest(unittest2.TestCase):
         self.nova = NOVA_DATA
         self.swift = SWIFT_DATA
         self.rabbitmq = RABBITMQ_DATA
+        self.keystone = KEYSTONE_DATA
 
         self._parse_defaults_file()
 
@@ -103,6 +104,20 @@ class FunctionalTest(unittest2.TestCase):
         self.glance['port'] = self.config['glance']['port']
         if 'apiver' in self.config['glance']:
             self.glance['apiver'] = self.config['glance']['apiver']
+
+        if 'nova' in self.config:
+            self.nova['host'] = self.config['nova']['host']
+            self.nova['port'] = self.config['nova']['port']
+            self.nova['ver'] = self.config['nova']['apiver']
+            self.nova['user'] = self.config['nova']['user']
+            self.nova['key'] = self.config['nova']['key']
+
+        if 'keystone' in self.config:
+            self.keystone['host'] = self.config['keystone']['host']
+            self.keystone['port'] = self.config['keystone']['port']
+            self.keystone['apiver'] = self.config['keystone']['apiver']
+            self.keystone['user'] = self.config['keystone']['user']
+            self.keystone['pass'] = self.config['keystone']['password']
 
     def _md5sum_file(self, path):
         md5sum = md5()
