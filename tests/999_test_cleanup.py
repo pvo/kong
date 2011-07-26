@@ -74,7 +74,7 @@ class TestCleanUp(tests.FunctionalTest):
         if 'apiver' in self.glance:
             path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
                           self.glance['port'], self.glance['apiver'],
-                          self.glance['kernel_id'])
+                          self.glance['ramdisk_id'])
         else:
             path = "http://%s:%s/images/%s" % (self.glance['host'],
                           self.glance['port'], self.glance['ramdisk_id'])
@@ -87,7 +87,7 @@ class TestCleanUp(tests.FunctionalTest):
         if 'apiver' in self.glance:
             path = "http://%s:%s/%s/images/%s" % (self.glance['host'],
                           self.glance['port'], self.glance['apiver'],
-                          self.glance['kernel_id'])
+                          self.glance['image_id_id'])
         else:
             path = "http://%s:%s/images/%s" % (self.glance['host'],
                           self.glance['port'], self.glance['image_id'])
