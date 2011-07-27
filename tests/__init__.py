@@ -90,14 +90,15 @@ class FunctionalTest(unittest2.TestCase):
         self._parse_defaults_file()
 
         # Swift Setup
-        self.swift['auth_host'] = self.config['swift']['auth_host']
-        self.swift['auth_port'] = self.config['swift']['auth_port']
-        self.swift['auth_prefix'] = self.config['swift']['auth_prefix']
-        self.swift['auth_ssl'] = self.config['swift']['auth_ssl']
-        self.swift['account'] = self.config['swift']['account']
-        self.swift['username'] = self.config['swift']['username']
-        self.swift['password'] = self.config['swift']['password']
-        self.swift['ver'] = 'v1.0'  # need to find a better way to get this.
+        if 'swift' in self.config:
+            self.swift['auth_host'] = self.config['swift']['auth_host']
+            self.swift['auth_port'] = self.config['swift']['auth_port']
+            self.swift['auth_prefix'] = self.config['swift']['auth_prefix']
+            self.swift['auth_ssl'] = self.config['swift']['auth_ssl']
+            self.swift['account'] = self.config['swift']['account']
+            self.swift['username'] = self.config['swift']['username']
+            self.swift['password'] = self.config['swift']['password']
+            self.swift['ver'] = 'v1.0'  # need to find a better way to get this.
 
         # Glance Setup
         self.glance['host'] = self.config['glance']['host']
